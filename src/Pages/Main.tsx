@@ -1,45 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DraggableCard from "../CardComponents/DraggableCard";
+import SeparateCardsToDecks from "../Utility/SeparateCardsToDecks";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from 'react-bootstrap';
+import '../styles/decks.css'
 
 function Main() {
-    const [cardData, setCardData] = useState<any[]>([]);
+    //get all cards separated by types (with keys)
+    const cardData = SeparateCardsToDecks();
     const navigate = useNavigate();
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await window.cardData.fetchCards();
-                if (data !== undefined) {
-                    setCardData(data);
-                } else {
-                    console.log("Fetched card data incorrect");
-                }
-            } catch (error) {
-                console.error('Error fetching card data:', error);
-            }
-        };
 
-        fetchData();
-    }, []);
-
-    const goToNewCardPage = () =>{
+    const goToNewCardPage = () => {
         navigate('/new-card');
     }
+
     return (
-        <div>
+        <div className="container">
+        <nav>
+            <Button onClick={goToNewCardPage}>Add New Card</Button>
+        </nav>
 
-            <nav>
-                <Button onClick={goToNewCardPage}>Add New Card</Button>
-            </nav>
-
-
-            {cardData.map((card, index) => (
-                <DraggableCard key={index} card={card} />
-            ))}
-            
-        </div>
+        {Object.keys(cardData).map((deckType, index) => (
+            <div key={index} className="deck-section">
+                <h2>{deckType} Deck</h2>
+                <div className="cards-container">
+                    {cardData[deckType].map((card, cardIndex) => (
+                        <DraggableCard key={cardIndex} card={card}  />
+                    ))}
+                </div>
+            </div>
+        ))}
+    </div>
     );
 }
 

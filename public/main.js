@@ -86,48 +86,44 @@ ipcMain.handle('fetch-card-data', (event) => {
   }
 });
 
-  //save-card from NewCardPage
-  ipcMain.on('save-card', (event, cardInfo) => {
-    //this is where all the cards are stored
-    const directoryPath = path.join(__dirname, '..', 'src', 'CardData');
-    const directoryImagePath = path.join(__dirname, '..', 'src', 'CardImages');
-    const {title, description, note, image } = cardInfo;
-    console.log('Received card info:', cardInfo); // Check what properties are present
-    
-    // Save image file to cardData directory
-    const imageFileName = `${title.replace(/\s+/g, '-')}.jpg`; // Example: converting title to filename
-    const imagePath = path.join(directoryImagePath, imageFileName);
+// save-card from NewCardPage
+ipcMain.on('save-card', (event, cardInfo) => {
+  // this is where all the cards are stored
+  const directoryPath = path.join(__dirname, '..', 'src', 'CardData');
+  //const directoryImagePath = path.join(__dirname, '..', 'src', 'CardImages');
+  const { title, description, note, image } = cardInfo; // assuming image is a Buffer
+  console.log('Received card info:', cardInfo); // Check what properties are present
+  
+  /*
+  // Save image file to cardData directory
+  const imageFileName = `${title.replace(/\s+/g, '-')}.jpg`; // Example: converting title to filename
+  const imagePath = path.join(directoryImagePath, imageFileName);
 
-   // Decode base64 image data (if necessary)
-   const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
-   const buffer = Buffer.from(base64Data, 'base64');
+  // Write image file
+  fs.writeFile(imagePath, image, (err) => {
+    if (err) {
+      console.error('Error saving image:', err);
+      event.reply('save-card-error', err.message); // Send error message back to renderer process
+      return;
+    }
+    console.log('Image saved successfully:', imagePath);
+  */
+    // Save metadata (title, description, note) to a JSON file
+    const metaData = {
+      title,
+      description,
+      note,
+      image // Store the path to the image file
+    };
+    const metaDataPath = path.join(directoryPath, `${title.replace(/\s+/g, '-')}.json`);
 
-   // Write image file
-   fs.writeFile(imagePath, buffer, (err) => {
-       if (err) {
-           console.error('Error saving image:', err);
-           event.reply('save-card-error', err.message); // Send error message back to renderer process
-           return;
-       }
-       console.log('Image saved successfully:', imagePath);
-
-       // Save metadata (title, description, note) to a JSON file
-       const metaData = {
-           title,
-           description,
-           note,
-           image: imagePath // Store the path to the image file
-       };
-       const metaDataPath = path.join(directoryPath, `${title.replace(/\s+/g, '-')}.json`);
-
-       fs.writeFile(metaDataPath, JSON.stringify(metaData), (err) => {
-           if (err) {
-               console.error('Error saving metadata:', err);
-               event.reply('save-card-error', err.message); // Send error message back to renderer process
-               return;
-           }
-           console.log('Metadata saved successfully:', metaDataPath);
-           event.reply('save-card-success', metaData); // Send success message and metadata back to renderer process
-       });
-   });
-});
+    fs.writeFile(metaDataPath, JSON.stringify(metaData), (err) => {
+      if (err) {
+        console.error('Error saving metadata:', err);
+        event.reply('save-card-error', err.message); // Send error message back to renderer process
+        return;
+      }
+      console.log('Metadata saved successfully:', metaDataPath);
+      event.reply('save-card-success', metaData); // Send success message and metadata back to renderer process
+    });
+  });

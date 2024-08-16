@@ -1,45 +1,104 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+//rtdatabase
+import { ref as databaseRef, set, push, get,child} from 'firebase/database';
+import { database } from '../firebase';
+import {storage} from "../firebase";
+//storage
+import {ref as storageRef, uploadBytes, getDownloadURL} from "firebase/storage";
+import {v4} from "uuid";
 
 const NewCardPage: React.FC = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [note, setNote] = useState('');
     const [image, setImage] = useState<File | null>(null);
+    const [type, setType] = useState('');
+    const [rootKeys, setRootKeys] = useState<string[]>([]);
     const navigate = useNavigate();
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]){
-            setImage(e.target.files[0]);
-        }
-    }
 
-    const onSubmit = (e: React.FormEvent<HTMLFormElement>) =>{
-        e.preventDefault();
-        
-        const newCard = {
-            title, 
-            description,
-            note, 
-            image: image ? URL.createObjectURL(image) : ''
+    useEffect(() => {
+        // Fetch root keys from Firebase
+        const fetchRootKeys = async () => {
+            try {
+                const rootRef = databaseRef(database, '/');
+                const snapshot = await get(rootRef);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const keys = Object.keys(data);
+                    setRootKeys(keys);
+                } else {
+                    console.log("No data available");
+                }
+            } catch (error) {
+                console.error('Error fetching root keys:', error);
+            }
         };
 
+        fetchRootKeys();
+    }, []);
+    //handle image
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(e);
+        if (e.target.files && e.target.files[0]) {
+            //[0]: First file (it is not uploading many)
+            setImage(e.target.files[0]);
+        }
+    };
+
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log("test");
+        var storedImageRef = null;
+        var imageURL = null
+        if (!image) {
+            console.error('No image selected');
+            return;
+        }
+        try{
+        //access firebase
+        //get to folder cardImages then make random name with v4()
+        storedImageRef = storageRef(storage, `cardImages/${image.name + v4()}`);
+        //upload image to the firebase storage location. Await: Wait to finish uploading or else I might get the URL of something that doesn't exist (getDownloadURL)
+        await uploadBytes(storedImageRef, image).then(() =>{
+            console.log("Image uploaded");
+        });
+
+        // Get download URL in firebase for the uploaded image from firebase. 
+        imageURL = await getDownloadURL(storedImageRef);
+        const newCardRef = databaseRef(database, `${type}/${v4()}`);
+        //save json card in firestore realtime database
+        const newCard = {
+            title,
+            description,
+            note,
+            type,
+            image: imageURL || '' 
+        };
         console.log(newCard);
+        await set(newCardRef, newCard);
+        } catch(error){
+            console.error('Error saving card:', error);
+        }
+        //Delete below because will not save locally
+        /*
         try {
             window.cardData.saveCard(newCard);
             console.log('Card saved successfully!');
         } catch (error) {
             console.error('Error saving card:', error);
         }
+        */
     };
 
-    const goToMainPage = () =>{
+    const goToMainPage = () => {
         navigate('/');
-    }
+    };
 
-    return(
+    return (
         <div className="container">
-             <nav>
+            <nav>
                 <Button onClick={goToMainPage}>Main Page</Button>
             </nav>
 
@@ -80,12 +139,25 @@ const NewCardPage: React.FC = () => {
                         onChange={handleImageUpload}
                     />
                 </Form.Group>
+                <Form.Group controlId="formType">
+                    <Form.Label>Type</Form.Label>
+                    <Form.Control
+                        as="select"
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                    >
+                        <option value="">Select type</option>
+                        {rootKeys.map((key) => (
+                            <option key={key} value={key}>{key}</option>
+                        ))}
+                    </Form.Control>
+                </Form.Group>
                 <Button variant="primary" type="submit">
                     Save Card
                 </Button>
             </Form>
         </div>
-    );      
+    );
 };
 
 export default NewCardPage;

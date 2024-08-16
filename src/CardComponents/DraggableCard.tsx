@@ -58,15 +58,15 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card }) => {
             style={{
                 position: 'absolute',
                 cursor: 'pointer',
-                top: '0',
-                left: '0'
+                
             }}
         >
             <Card
                 title={card.title}
-                image={require(`../CardImages/${card.image}`)}
+                image={card.image}
                 description={card.description}
                 note={card.note}
+                type = {card.type}
             />
         </div>
     );
