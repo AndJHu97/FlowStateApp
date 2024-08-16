@@ -9,21 +9,24 @@ const SeparateCardsByDecks = () => {
         const fetchCardsByType = async () => {
             let allCards: { [key: string]: any[] } = {};
             try {
+                //get all cards from database
                 const rootRef = databaseRef(database, '/');
                 const snapshot = await get(rootRef);
 
                 if (snapshot.exists()) {
                     const data = snapshot.val();
+                    //list of cards in the specific type
                     const keys = Object.keys(data);
-
+                    //go through all types/decks
                     for (const key of keys) {
                         console.log(`Processing key: ${key}`);
-
                         const cardsInKeyRef = databaseRef(database, `/${key}`);
                         const cardsSnapshot = await get(cardsInKeyRef);
-
+                        //getting cards of the type
                         if (cardsSnapshot.exists()) {
+                            //all the data in the deck
                             const cardsData = cardsSnapshot.val();
+                            //get all the cards in deck with formatted data
                             const formattedData = Object.keys(cardsData).map(cardKey => ({
                                 id: cardKey,
                                 ...cardsData[cardKey]
