@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DraggableCard from "../CardComponents/DraggableCard";
 import SeparateCardsToDecks from "../Utility/SeparateCardsToDecks";
+import Deck from "../Deck/Deck";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from 'react-bootstrap';
 import '../styles/decks.css'
@@ -22,14 +22,7 @@ function Main() {
         </nav>
 
         {Object.keys(cardData).map((deckType, index) => (
-            <div key={index} className="deck-section">
-                <h2>{deckType} Deck</h2>
-                <div className="cards-container">
-                    {cardData[deckType].map((card, cardIndex) => (
-                        <DraggableCard key={cardIndex} card={card}  />
-                    ))}
-                </div>
-            </div>
+            <Deck cardData = {cardData} deckType = {deckType} index = {index}/>
         ))}
     </div>
     );
