@@ -2,12 +2,19 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Card from "../CardComponents/Card";
 
-interface DraggableCardProps {
-    card: any;
-    deckPositions: { [key: string]: DOMRect[] };
+interface DeckInfo {
+    rect: DOMRect[];
+    maxCardsInDeck: number | null;
+    currentCardsInDeck: number;
 }
 
-const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckPositions }) => {
+
+interface DraggableCardProps {
+    card: any;
+    deckInfos: { [key: string]: DeckInfo };
+}
+
+const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckInfos }) => {
     const [isClicked, setIsClicked] = useState(false);
     //reference the card itself to access div or dom
     const cardRef = useRef<HTMLDivElement>(null);
@@ -63,18 +70,35 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckPositions }) =>
         if (cardRef.current) {
             const cardRect = cardRef.current.getBoundingClientRect();
             // Filter deck positions based on card type
-            const filteredDeckPositions = deckPositions[card.type] || [];
-            console.log("card type: " + card.type);
+            const filteredDeckPositions = deckInfos[card.type]?.rect || [];
             let snapped = false;
             // Snap to the closest deck
             for (const deckRect of filteredDeckPositions) {
                 if (isCloseToDeck(cardRect, deckRect)) {
-                    cardRef.current.style.top = `${deckRect.top}px`;
-                    cardRef.current.style.left = `${deckRect.left }px`;
-                    console.log("deckRect new position: " + `${deckRect.top }px`);
-                    console.log("New positions: " + cardRef.current.style.top);
-                    snapped = true;
-                    setInitialPosition({top: deckRect.top, left: deckRect.left})
+                    //Add snap feedback from the deck to see if hit card limit
+                    let maxCardsInDeck = deckInfos[card.type].maxCardsInDeck
+                    let currentCardsInDeck = deckInfos[card.type].currentCardsInDeck
+                    console.log("current number in decK: " + currentCardsInDeck + " max number in deck: " + maxCardsInDeck);
+                    if (maxCardsInDeck == null) {
+                        snapped = true;
+                    } else {
+                        if (currentCardsInDeck < maxCardsInDeck) {
+                            console.log("add number");
+                            currentCardsInDeck += 1;
+                            deckInfos[card.type].currentCardsInDeck = currentCardsInDeck
+                            snapped = true;
+                        } else {
+                            console.log("Don't add number");
+                            snapped = false;
+                        }
+                    }
+                    //if snappable meaning there's room for another card
+                    if(snapped){
+                        cardRef.current.style.top = `${deckRect.top}px`;
+                        cardRef.current.style.left = `${deckRect.left }px`;
+                        setInitialPosition({top: deckRect.top, left: deckRect.left})
+                    }
+                    
                     break;
                 }
             }

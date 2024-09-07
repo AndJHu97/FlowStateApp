@@ -6,27 +6,41 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from 'react-bootstrap';
 import '../styles/decks.css'
 
+interface DeckInfo {
+    rect: DOMRect[];
+    maxCardsInDeck: number | null;
+    currentCardsInDeck: number;
+}
+
 function Main() {
     //get all cards separated by types (with keys)
     const cardData = SeparateCardsToDecks();
     const navigate = useNavigate();
-    const [deckPositions, setDeckPositions] = useState<{ [key: string]: DOMRect[] }>({});
+    
+    //const [deckCallbacks, setDeckCallbacks] = useState<{ [key: string]: (cardId: string) => void }>({});
+    //const [deckPositions, setDeckPositions] = useState<{ [key: string]: DOMRect[] }>({});
 
+    const [deckInfo, setDeckInfo] = useState<{ 
+        [key: string]: DeckInfo
+    }>({});
     const goToNewCardPage = () => {
         navigate('/new-card');
     }
 
-    const handleDeckPositionChange = (deckType: string, rect: DOMRect) => {
-        setDeckPositions((prevPositions) => ({
-            ...prevPositions,
-            [deckType]: prevPositions[deckType] ? [...prevPositions[deckType], rect] : [rect]
-        }));
-    };
+    const handleDeckPositionChange = (deckType: string, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => {
+        setDeckInfo(prevPositions => {
+            const currentDeckInfo = prevPositions[deckType] || { rect: [], currentCardsInDeck: currentCardsInDeck, maxCardsInDeck: maxCardsInDeck};
 
-    // Log deckPositions whenever it changes
-    useEffect(() => {
-        console.log("Updated deck positions:", deckPositions);
-    }, [deckPositions]);
+            return {
+                ...prevPositions,
+                [deckType]: {
+                    ...currentDeckInfo,
+                    //adds the new rect to the array
+                    rect: [...currentDeckInfo.rect, rect] // Add the new rect to the array
+                }
+            };
+        });
+    };
 
     return (
         <div className="container">
@@ -35,7 +49,7 @@ function Main() {
         </nav>
 
         {Object.keys(cardData).map((deckType, index) => (
-            <Deck key={deckType} cardData = {cardData} deckType = {deckType} index = {index} deckPositions={deckPositions} onDeckPositionChange={handleDeckPositionChange}/>
+            <Deck key={deckType} cardData = {cardData} deckType = {"Ego"} maxCardsInDeck={3} index = {index} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
         ))}
     </div>
     );
