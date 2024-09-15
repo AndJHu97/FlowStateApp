@@ -3,25 +3,29 @@ import React, { useRef, useState, useEffect } from 'react';
 import Card from "../CardComponents/Card";
 
 interface DeckInfo {
-    rect: DOMRect[];
-    maxCardsInDeck: number | null;
-    currentCardsInDeck: number;
+    [index: number]:{
+        rect: DOMRect;
+        maxCardsInDeck: number | null;
+        currentCardsInDeck: number;
+    }
 }
 
 
 interface DraggableCardProps {
     card: any;
+    index: number;
     deckInfos: { [key: string]: DeckInfo };
+    onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
-const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckInfos }) => {
+const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, onDeckCurrentNumberChange }) => {
     const [isClicked, setIsClicked] = useState(false);
     //reference the card itself to access div or dom
     const cardRef = useRef<HTMLDivElement>(null);
     const coords = useRef<{ startX: number, startY: number }>({ startX: 0, startY: 0 });
     const [initialPosition, setInitialPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-    
-
+    const [currentIndex, setCurrentIndex] = useState(Number);
+    const [isSnapped, setIsSnapped] = useState(false);
      // Capture the initial position of the card
      useEffect(() => {
         if (cardRef.current) {
@@ -31,6 +35,8 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckInfos }) => {
                 left: rect.left + window.scrollX,
             });
         }
+        //set the index of deck to the original (don't do it again)
+        setCurrentIndex(index);
     }, []);
 
 
@@ -50,7 +56,12 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckInfos }) => {
     const onMouseUp = () => {
         console.log("Mouse up detected");
         setIsClicked(false);
-        snapToDeck();
+        
+        if (!isSnapped) {
+            snapToDeck();
+        }
+        //reset
+        setIsSnapped(false);
     };
     
     const onMouseMove = (e: MouseEvent) => {
@@ -67,26 +78,39 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckInfos }) => {
     
 
     const snapToDeck = () => {
-        if (cardRef.current) {
-            const cardRect = cardRef.current.getBoundingClientRect();
-            // Filter deck positions based on card type
-            const filteredDeckPositions = deckInfos[card.type]?.rect || [];
-            let snapped = false;
-            // Snap to the closest deck
-            for (const deckRect of filteredDeckPositions) {
-                if (isCloseToDeck(cardRect, deckRect)) {
+        //issnapped makes it so after you snap it, it prevents it from running twice. Will reset snap = false when mouse up 
+        if (isSnapped || !cardRef.current) return;
+        const cardRect = cardRef.current.getBoundingClientRect();
+        // Filter deck positions based on card type
+        const typedDeckInfo = deckInfos[card.type] || {};
+        let snapped = false;
+        // Snap to the closest deck
+        //iterate through the keys of this deck type
+        for (const newIndex in typedDeckInfo) {
+            if (typedDeckInfo.hasOwnProperty(newIndex)) {
+                const deckPosition = typedDeckInfo[newIndex].rect;
+                if (isCloseToDeck(cardRect, deckPosition) && currentIndex != Number(newIndex)) {
                     //Add snap feedback from the deck to see if hit card limit
-                    let maxCardsInDeck = deckInfos[card.type].maxCardsInDeck
-                    let currentCardsInDeck = deckInfos[card.type].currentCardsInDeck
-                    console.log("current number in decK: " + currentCardsInDeck + " max number in deck: " + maxCardsInDeck);
+                    let maxCardsInDeck = deckInfos[card.type][newIndex].maxCardsInDeck
+                    let currentCardsInDeck = deckInfos[card.type][newIndex].currentCardsInDeck
+                    console.log("number in moving decK: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.type][currentIndex].currentCardsInDeck);
+                    console.log("Current key of deck: " + currentIndex);
                     if (maxCardsInDeck == null) {
                         snapped = true;
                     } else {
                         if (currentCardsInDeck < maxCardsInDeck) {
                             console.log("add number");
                             currentCardsInDeck += 1;
-                            deckInfos[card.type].currentCardsInDeck = currentCardsInDeck
+                            deckInfos[card.type][newIndex].currentCardsInDeck = currentCardsInDeck
+                            deckInfos[card.type][currentIndex].currentCardsInDeck -= 1
                             snapped = true;
+                            
+                            //change the values of the deck it is moving from and the card it is moving to
+                            onDeckCurrentNumberChange(card.type, currentIndex, deckInfos[card.type][currentIndex].currentCardsInDeck)
+                            onDeckCurrentNumberChange(card.type, Number(newIndex), currentCardsInDeck);
+
+                            //change specific deck index to new one you moved to
+                            setCurrentIndex(Number(newIndex));
                         } else {
                             console.log("Don't add number");
                             snapped = false;
@@ -94,21 +118,21 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckInfos }) => {
                     }
                     //if snappable meaning there's room for another card
                     if(snapped){
-                        cardRef.current.style.top = `${deckRect.top}px`;
-                        cardRef.current.style.left = `${deckRect.left }px`;
-                        setInitialPosition({top: deckRect.top, left: deckRect.left})
+                        cardRef.current.style.top = `${deckPosition.top}px`;
+                        cardRef.current.style.left = `${deckPosition.left }px`;
+                        setInitialPosition({top: deckPosition.top, left: deckPosition.left});
+                        setIsSnapped(true);
                     }
                     
                     break;
                 }
             }
-            if(!snapped){
-                cardRef.current.style.top = `${initialPosition.top}px`;
-                cardRef.current.style.left = `${initialPosition.left}px`;
-                console.log("go back to original position");
-            }
-           
-    };
+        }
+        if(!snapped){
+            cardRef.current.style.top = `${initialPosition.top}px`;
+            cardRef.current.style.left = `${initialPosition.left}px`;
+            console.log("go back to original position");
+        }
     };
 
     const isCloseToDeck = (cardRect: DOMRect, deckRect: DOMRect) => {

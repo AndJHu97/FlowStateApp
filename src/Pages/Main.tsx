@@ -7,9 +7,12 @@ import { Button } from 'react-bootstrap';
 import '../styles/decks.css'
 
 interface DeckInfo {
-    rect: DOMRect[];
-    maxCardsInDeck: number | null;
-    currentCardsInDeck: number;
+    [index: number]:{
+        rect: DOMRect;
+        maxCardsInDeck: number | null;
+        currentCardsInDeck: number;
+    }
+    
 }
 
 function Main() {
@@ -27,20 +30,48 @@ function Main() {
         navigate('/new-card');
     }
 
-    const handleDeckPositionChange = (deckType: string, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => {
+    const handleDeckPositionChange = (deckType: string, index: number, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => {
         setDeckInfo(prevPositions => {
-            const currentDeckInfo = prevPositions[deckType] || { rect: [], currentCardsInDeck: currentCardsInDeck, maxCardsInDeck: maxCardsInDeck};
+            const currentDeckInfo = prevPositions[deckType] || {};
+            
+            //retrieve the index of the specific deck of that type (like deck 2 of Ego deck)
+            const currentDeck = currentDeckInfo[index] || {
+                rect: null,
+                currentCardsInDeck: currentCardsInDeck,
+                maxCardsInDeck: maxCardsInDeck
+            }
 
             return {
                 ...prevPositions,
                 [deckType]: {
                     ...currentDeckInfo,
-                    //adds the new rect to the array
-                    rect: [...currentDeckInfo.rect, rect] // Add the new rect to the array
+                    [index]: {
+                    ...currentDeck,
+                    rect: rect, // Update the rect array
+                    currentCardsInDeck: currentCardsInDeck, // Update the currentCardsInDeck
+                    maxCardsInDeck: maxCardsInDeck // Update the maxCardsInDeck
+                    }
                 }
             };
         });
     };
+
+    const onDeckCurrentNumberChange = (deckType: string, index: number, currentCardsInDeck: number) => {
+        setDeckInfo(prevPositions =>{
+            const currentDeckInfo = prevPositions[deckType]
+            const currentDeck = currentDeckInfo[index]
+            return {
+                ...prevPositions,
+                [deckType]: {
+                    ...currentDeckInfo,
+                    [index]: {
+                    ...currentDeck,
+                    currentCardsInDeck: currentCardsInDeck, // Update the currentCardsInDeck
+                    }
+                }
+            };
+        })
+    }
 
     return (
         <div className="container">
@@ -49,7 +80,7 @@ function Main() {
         </nav>
 
         {Object.keys(cardData).map((deckType, index) => (
-            <Deck key={deckType} cardData = {cardData} deckType = {"Ego"} maxCardsInDeck={3} index = {index} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
+            <Deck key={deckType} cardData = {cardData} deckType = {"Ego"} maxCardsInDeck={3} index = {index} onDeckCurrentNumberChange={onDeckCurrentNumberChange} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
         ))}
     </div>
     );

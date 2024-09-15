@@ -4,11 +4,12 @@ import LoadingArea from "./CardLoadingArea";
 import '../styles/decks.css'
 
 interface DeckInfo {
-    rect: DOMRect[];
-    maxCardsInDeck: number | null;
-    currentCardsInDeck: number;
+    [index: number]:{
+        rect: DOMRect;
+        maxCardsInDeck: number | null;
+        currentCardsInDeck: number;
+    }   
 }
-
 
 interface DeckProps{
     deckType: string,
@@ -17,10 +18,11 @@ interface DeckProps{
     deckInfos: { [key: string]: DeckInfo }; // Use the DeckInfo interface here
     maxCardsInDeck?: number | null;
     maxCardsToLoad?: number | null;
-    onDeckPositionChange: (deckType: string, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => void;
+    onDeckPositionChange: (deckType: string, index: number, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => void;
+    onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
-const Deck: React.FC<DeckProps> = (({cardData, deckType, index, deckInfos: deckInfos, maxCardsInDeck = null, maxCardsToLoad = null, onDeckPositionChange}) =>
+const Deck: React.FC<DeckProps> = (({cardData, deckType, index, deckInfos: deckInfos, maxCardsInDeck = null, maxCardsToLoad = null, onDeckPositionChange, onDeckCurrentNumberChange}) =>
     {
         const deckRef = useRef<HTMLDivElement>(null);
         
@@ -47,7 +49,7 @@ const Deck: React.FC<DeckProps> = (({cardData, deckType, index, deckInfos: deckI
                 y: rect.y + window.scrollY
             };
 
-            onDeckPositionChange(deckType, adjustedRect as DOMRect, cardsInDeck, maxCardsInDeck);
+            onDeckPositionChange(deckType, index, adjustedRect as DOMRect, cardsInDeck, maxCardsInDeck);
         }
         
 
@@ -57,7 +59,7 @@ const Deck: React.FC<DeckProps> = (({cardData, deckType, index, deckInfos: deckI
                 <div className="cards-container">
                     <LoadingArea onDeckPositionChange={handleCardLoadingArea}/>
                     {cardData[deckType].slice(0, localMaxCardsToLoad).map((card) => (
-                        <DraggableCard key={card.id} card={card} deckInfos={deckInfos} />
+                        <DraggableCard key={card.id} index = {index} card={card} deckInfos={deckInfos} onDeckCurrentNumberChange={onDeckCurrentNumberChange}/>
                     ))}
                 </div>
             </div>
