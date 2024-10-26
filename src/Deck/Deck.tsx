@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import DraggableCard from "../CardComponents/DraggableCard";
+import CreateableCard from "../CardComponents/CreateableCard";
 import LoadingArea from "./CardLoadingArea";
 import '../styles/decks.css'
+import DraggableCard from '../CardComponents/DraggableCard';
 
 interface DeckInfo {
     [index: number]:{

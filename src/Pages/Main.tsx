@@ -17,7 +17,7 @@ interface DeckInfo {
 
 function Main() {
     //get all cards separated by types (with keys)
-    const cardData = SeparateCardsToDecks();
+    const cardData = SeparateCardsToDecks("Hint");
     const navigate = useNavigate();
     
     //const [deckCallbacks, setDeckCallbacks] = useState<{ [key: string]: (cardId: string) => void }>({});
@@ -30,6 +30,7 @@ function Main() {
         navigate('/new-card');
     }
 
+    //I think this stores all the position of all the decks
     const handleDeckPositionChange = (deckType: string, index: number, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => {
         setDeckInfo(prevPositions => {
             const currentDeckInfo = prevPositions[deckType] || {};
@@ -80,7 +81,7 @@ function Main() {
         </nav>
 
         {Object.keys(cardData).map((deckType, index) => (
-            <Deck key={deckType} cardData = {cardData} deckType = {"Ego"} maxCardsInDeck={3} index = {index} onDeckCurrentNumberChange={onDeckCurrentNumberChange} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
+            <Deck key={deckType} cardData = {cardData} deckType = {deckType} maxCardsInDeck={3} index = {index} onDeckCurrentNumberChange={onDeckCurrentNumberChange} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
         ))}
     </div>
     );
