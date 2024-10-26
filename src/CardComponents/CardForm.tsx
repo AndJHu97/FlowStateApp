@@ -37,7 +37,7 @@ const CardForm: React.FC<CardFormProps> = ({onClose, parentCardLocation, cardTyp
         e.preventDefault();
         //console.log("test");
         var storedImageRef = null;
-        var imageURL = null
+        var imageURL = null;
         if (!image) {
             console.error('No image selected');
             return;
