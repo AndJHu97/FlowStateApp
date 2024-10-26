@@ -6,12 +6,13 @@ interface CardProps {
   image: any;
   description: string;
   note: string;
-  type: string;
+  categoryType: string;
+  cardType: string;
 }
 
 
 
-const Card: React.FC<CardProps> = ({ title, image, description, note, type }) => {
+const Card: React.FC<CardProps> = ({ title, image, description, note, categoryType, cardType }) => {
   return (
  
       <div className="card-container" style={{ border: '5px solid #ccc', borderRadius: '5px', padding: '10px', display: 'inline-block' }}>
@@ -25,7 +26,8 @@ const Card: React.FC<CardProps> = ({ title, image, description, note, type }) =>
             <h6 className="card-title">Notes</h6>
             <p className="card-text">{note}</p>
             <h6 className="card-title">Type</h6>
-            <p className="card-text">{type}</p>
+            <p className="card-text">{categoryType}</p>
+            <p className="card-text">{cardType}</p>
             <div className="container" style={{ alignItems: "center" }}>
               <a href="#" className="btn btn-primary">
                 View Details

@@ -1,6 +1,6 @@
 // Get attributes of card moving events from mouse clicks 
 import React, { useRef, useState, useEffect } from 'react';
-import Card from "../CardComponents/Card";
+import CreatableCard from "../CardComponents/CreateableCard";
 
 interface DeckInfo {
     [index: number]:{
@@ -93,7 +93,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, o
                     //Add snap feedback from the deck to see if hit card limit
                     let maxCardsInDeck = deckInfos[card.type][newIndex].maxCardsInDeck
                     let currentCardsInDeck = deckInfos[card.type][newIndex].currentCardsInDeck
-                    console.log("number in moving decK: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.type][currentIndex].currentCardsInDeck);
+                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.type][currentIndex].currentCardsInDeck);
                     console.log("Current key of deck: " + currentIndex);
                     if (maxCardsInDeck == null) {
                         snapped = true;
@@ -169,12 +169,14 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, o
                 cursor: 'pointer',
             }}
         >
-            <Card
+            <CreatableCard
                 title={card.title}
                 image={card.image}
                 description={card.description}
                 note={card.note}
-                type = {card.type}
+                categoryType = {card.categoryType}
+                cardType = {card.cardType}
+                cardLocation= {card.location}
             />
         </div>
     );

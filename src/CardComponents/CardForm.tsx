@@ -1,6 +1,7 @@
+// CardForm.tsx
 import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+
 //rtdatabase
 import { ref as databaseRef, set, push, get,child} from 'firebase/database';
 import { database } from '../firebase';
@@ -9,39 +10,20 @@ import {storage} from "../firebase";
 import {ref as storageRef, uploadBytes, getDownloadURL} from "firebase/storage";
 import {v4} from "uuid";
 
-const NewCardPage: React.FC = () => {
+interface CardFormProps {
+    onClose: () => void;
+    parentCardLocation: string;
+    cardType: string;
+    categoryType: string;
+}
+
+const CardForm: React.FC<CardFormProps> = ({onClose, parentCardLocation, cardType, categoryType}) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [note, setNote] = useState('');
     const [image, setImage] = useState<File | null>(null);
-    const [categoryType, setCategoryType] = useState('');
-    const [rootKeys, setRootKeys] = useState<string[]>([]);
-    const [cardTypes] = useState<string[]>(['Hint']);
-    const [selectedCardType, setSelectedCardType] = useState('');
-    const navigate = useNavigate();
+    
 
-    useEffect(() => {
-        // Fetch root keys from Firebase to get the cardType for the dropdown selection
-        const fetchRootKeys = async () => {
-            try {
-                const rootRef = databaseRef(database, '/');
-                //get the database
-                const snapshot = await get(rootRef);
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    //this should be cardType, which will be in the dropdown
-                    const keys = Object.keys(data);
-                    setRootKeys(keys);
-                } else {
-                    console.log("No data available");
-                }
-            } catch (error) {
-                console.error('Error fetching root keys:', error);
-            }
-        };
-
-        fetchRootKeys();
-    }, []);
     //handle image
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log(e);
@@ -72,16 +54,17 @@ const NewCardPage: React.FC = () => {
         // Get download URL in firebase for the uploaded image from firebase. 
         imageURL = await getDownloadURL(storedImageRef);
         //get the new entry location for firebase in saving for this card
-        const newCardRef = databaseRef(database, `${categoryType}/${selectedCardType}/${v4()}`);
+        const newCardRef = databaseRef(database, `${parentCardLocation}/${cardType}/${v4()}`);
         //save json card in firestore realtime database
         const newCard = {
             title,
             description,
             note,
             categoryType: categoryType,
-            cardType: selectedCardType,
+            cardType: cardType,
             image: imageURL || '' 
         };
+        onClose();
         console.log(newCard);
         await set(newCardRef, newCard);
         } catch(error){
@@ -98,16 +81,8 @@ const NewCardPage: React.FC = () => {
         */
     };
 
-    const goToMainPage = () => {
-        navigate('/');
-    };
-
     return (
-        <div className="container">
-            <nav>
-                <Button onClick={goToMainPage}>Main Page</Button>
-            </nav>
-
+        <div className="card-form-overlay">
             <h2>Add New Card</h2>
             <Form onSubmit={onSubmit}>
                 <Form.Group controlId="formTitle">
@@ -146,29 +121,18 @@ const NewCardPage: React.FC = () => {
                     />
                 </Form.Group>
                 <Form.Group controlId="formType">
-                    <Form.Label>Flow Category Type</Form.Label>
-                    <Form.Control
-                        as="select"
-                        value={categoryType}
-                        onChange={(e) => setCategoryType(e.target.value)}
-                    >
-                        <option value="">Select type</option>
-                        {rootKeys.map((key) => (
-                            <option key={key} value={key}>{key}</option>
-                        ))}
-                    </Form.Control>
-                </Form.Group>
-                <Form.Group controlId="formType">
                     <Form.Label>Card Type</Form.Label>
                     <Form.Control
                         as="select"
-                        value={selectedCardType}
-                        onChange={(e) => setSelectedCardType(e.target.value)}
+                        value={cardType}
+                        disabled={true} // Disable if only one option
                     >
-                        <option value="">Select type</option>
-                        {cardTypes.map((cardType) => (
+                        <option value="">
+                            {"Only one type available"}
+                        </option>
+                        
                             <option key={cardType} value={cardType}>{cardType}</option>
-                        ))}
+        
                     </Form.Control>
                 </Form.Group>
                 <Button variant="primary" type="submit">
@@ -179,4 +143,4 @@ const NewCardPage: React.FC = () => {
     );
 };
 
-export default NewCardPage;
+export default CardForm;
