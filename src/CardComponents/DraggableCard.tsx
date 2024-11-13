@@ -81,19 +81,22 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, o
         //issnapped makes it so after you snap it, it prevents it from running twice. Will reset snap = false when mouse up 
         if (isSnapped || !cardRef.current) return;
         const cardRect = cardRef.current.getBoundingClientRect();
-        // Filter deck positions based on card type
-        const typedDeckInfo = deckInfos[card.type] || {};
+        // Filter deck positions based on card type. i.e. act, ego, etc. Find the one based on this card that is moving
+        const sameDeckInfo = deckInfos[card.deckLocation] || {};
+        //console.log("sameDeckInfo: ");
         let snapped = false;
         // Snap to the closest deck
-        //iterate through the keys of this deck type
-        for (const newIndex in typedDeckInfo) {
-            if (typedDeckInfo.hasOwnProperty(newIndex)) {
-                const deckPosition = typedDeckInfo[newIndex].rect;
-                if (isCloseToDeck(cardRect, deckPosition) && currentIndex != Number(newIndex)) {
+        //iterate through the id/location of the decks same as the cards
+        for (const specificDeckIndex in sameDeckInfo) {
+            if (sameDeckInfo.hasOwnProperty(specificDeckIndex)) {
+                
+                const deckPosition = sameDeckInfo[specificDeckIndex].rect;
+                console.log("Deck position: " + sameDeckInfo[specificDeckIndex].maxCardsInDeck);
+                if (isCloseToDeck(cardRect, deckPosition) && currentIndex != Number(specificDeckIndex)) {
                     //Add snap feedback from the deck to see if hit card limit
-                    let maxCardsInDeck = deckInfos[card.type][newIndex].maxCardsInDeck
-                    let currentCardsInDeck = deckInfos[card.type][newIndex].currentCardsInDeck
-                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.type][currentIndex].currentCardsInDeck);
+                    let maxCardsInDeck = deckInfos[card.deckLocation][specificDeckIndex].maxCardsInDeck
+                    let currentCardsInDeck = deckInfos[card.deckLocation][specificDeckIndex].currentCardsInDeck
+                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.deckLocation][currentIndex].currentCardsInDeck);
                     console.log("Current key of deck: " + currentIndex);
                     if (maxCardsInDeck == null) {
                         snapped = true;
@@ -101,16 +104,20 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, o
                         if (currentCardsInDeck < maxCardsInDeck) {
                             console.log("add number");
                             currentCardsInDeck += 1;
-                            deckInfos[card.type][newIndex].currentCardsInDeck = currentCardsInDeck
-                            deckInfos[card.type][currentIndex].currentCardsInDeck -= 1
+                            deckInfos[card.deckLocation][specificDeckIndex].currentCardsInDeck = currentCardsInDeck
+                            deckInfos[card.deckLocation][currentIndex].currentCardsInDeck -= 1
                             snapped = true;
                             
                             //change the values of the deck it is moving from and the card it is moving to
-                            onDeckCurrentNumberChange(card.type, currentIndex, deckInfos[card.type][currentIndex].currentCardsInDeck)
-                            onDeckCurrentNumberChange(card.type, Number(newIndex), currentCardsInDeck);
+
+                            //where it is moving from
+                            onDeckCurrentNumberChange(card.deckLocation, currentIndex, deckInfos[card.deckLocation][currentIndex].currentCardsInDeck)
+
+                            //where it is moving to
+                            onDeckCurrentNumberChange(card.deckLocation, Number(specificDeckIndex), currentCardsInDeck);
 
                             //change specific deck index to new one you moved to
-                            setCurrentIndex(Number(newIndex));
+                            setCurrentIndex(Number(specificDeckIndex));
                         } else {
                             console.log("Don't add number");
                             snapped = false;
