@@ -1,0 +1,45 @@
+.card-container {
+    border: 3px solid #ccc;
+    border-radius: 5px;
+    padding: 8px;
+    display: inline-block;
+  }
+  
+  .card {
+    width: 160px;
+    border: 0;
+    display: 'flex';
+    justify-content: 'center';
+    align-items: 'center';
+  }
+
+  .card-img-container {
+    display: flex; /* Make this container a flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100px; /* Optional, sets height for centering */
+  }
+  
+  .card-img-top {
+    max-width: 100%; /* Ensures the image doesn't exceed its container */
+    max-height: 100%; /* Ensures the image doesn't exceed its container */
+    object-fit: cover; /* Maintains aspect ratio */
+  }
+  
+  .card-body {
+    height: 250px;
+    width: 160px;
+    font-size: 12px;
+  }
+  
+  .card-title {
+    font-size: 14px;
+  }
+  
+  .card-title-small {
+    font-size: 13px;
+  }
+  
+  .btn-primary {
+    font-size: 13px;
+  }

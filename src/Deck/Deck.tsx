@@ -16,7 +16,7 @@ interface DeckInfo {
 
 interface DeckProps{
     deckID: string,
-    index: number,
+    deckIndex: number,
     cardData: { [key: string]: any[]}
     deckInfos: { [key: string]: DeckInfo }; // Use the DeckInfo interface here
     maxCardsInDeck?: number | null;
@@ -25,7 +25,7 @@ interface DeckProps{
     onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
-const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, index, deckInfos: deckInfos, maxCardsInDeck = null, maxCardsToLoad = null, onDeckPositionChange, onDeckCurrentNumberChange}) =>
+const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, deckInfos: deckInfos, maxCardsInDeck = null, maxCardsToLoad = null, onDeckPositionChange, onDeckCurrentNumberChange}) =>
     {
         const deckRef = useRef<HTMLDivElement>(null);
 
@@ -50,17 +50,17 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, index, deck
                 x: rect.x + window.scrollX,
                 y: rect.y + window.scrollY
             };
-            onDeckPositionChange(deckLocation, index, adjustedRect as DOMRect, cardsInDeck, maxCardsInDeck);
+            onDeckPositionChange(deckLocation, deckIndex, adjustedRect as DOMRect, cardsInDeck, maxCardsInDeck);
         }
         
 
         return (
-            <div ref={deckRef} key={index} className="deck-section">
+            <div ref={deckRef} key={deckIndex} className="deck-section">
                 <h4>{cardData[deckLocation][0].categoryType} {cardData[deckLocation][0].cardType} Deck</h4>
                 <div className="cards-container">
                     <LoadingArea onDeckPositionChange={handleCardLoadingArea}/>
                     {cardData[deckLocation].slice(0, localMaxCardsToLoad).map((card) => (
-                        <DraggableCard key={card.id} index = {index} card={card} deckInfos={deckInfos} onDeckCurrentNumberChange={onDeckCurrentNumberChange}/>
+                        <DraggableCard key={card.id} deckIndex = {deckIndex} card={card} deckInfos={deckInfos} onDeckCurrentNumberChange={onDeckCurrentNumberChange}/>
                     ))}
                 </div>
             </div>

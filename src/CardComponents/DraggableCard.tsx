@@ -13,18 +13,19 @@ interface DeckInfo {
 
 interface DraggableCardProps {
     card: any;
-    index: number;
+    deckIndex: number;
     deckInfos: { [key: string]: DeckInfo };
     onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
-const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, onDeckCurrentNumberChange }) => {
+//index is to check where in the 
+const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfos, onDeckCurrentNumberChange }) => {
     const [isClicked, setIsClicked] = useState(false);
     //reference the card itself to access div or dom
     const cardRef = useRef<HTMLDivElement>(null);
     const coords = useRef<{ startX: number, startY: number }>({ startX: 0, startY: 0 });
     const [initialPosition, setInitialPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-    const [currentIndex, setCurrentIndex] = useState(Number);
+    const [currentDeckIndex, setCurrentIndex] = useState(Number);
     const [isSnapped, setIsSnapped] = useState(false);
      // Capture the initial position of the card
      useEffect(() => {
@@ -36,7 +37,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, o
             });
         }
         //set the index of deck to the original (don't do it again)
-        setCurrentIndex(index);
+        setCurrentIndex(deckIndex);
     }, []);
 
 
@@ -86,18 +87,19 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, o
         //console.log("sameDeckInfo: ");
         let snapped = false;
         // Snap to the closest deck
-        //iterate through the id/location of the decks same as the cards
+        //iterate through the id aka location of the decks same as the cards
+        //i.e. if act card, will check all act decks on the field
         for (const specificDeckIndex in sameDeckInfo) {
             if (sameDeckInfo.hasOwnProperty(specificDeckIndex)) {
                 
                 const deckPosition = sameDeckInfo[specificDeckIndex].rect;
                 console.log("Deck position: " + sameDeckInfo[specificDeckIndex].maxCardsInDeck);
-                if (isCloseToDeck(cardRect, deckPosition) && currentIndex != Number(specificDeckIndex)) {
+                if (isCloseToDeck(cardRect, deckPosition) && currentDeckIndex != Number(specificDeckIndex)) {
                     //Add snap feedback from the deck to see if hit card limit
                     let maxCardsInDeck = deckInfos[card.deckLocation][specificDeckIndex].maxCardsInDeck
                     let currentCardsInDeck = deckInfos[card.deckLocation][specificDeckIndex].currentCardsInDeck
-                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.deckLocation][currentIndex].currentCardsInDeck);
-                    console.log("Current key of deck: " + currentIndex);
+                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.deckLocation][currentDeckIndex].currentCardsInDeck);
+                    console.log("Current key of deck: " + currentDeckIndex);
                     if (maxCardsInDeck == null) {
                         snapped = true;
                     } else {
@@ -105,13 +107,13 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, index, deckInfos, o
                             console.log("add number");
                             currentCardsInDeck += 1;
                             deckInfos[card.deckLocation][specificDeckIndex].currentCardsInDeck = currentCardsInDeck
-                            deckInfos[card.deckLocation][currentIndex].currentCardsInDeck -= 1
+                            deckInfos[card.deckLocation][currentDeckIndex].currentCardsInDeck -= 1
                             snapped = true;
                             
                             //change the values of the deck it is moving from and the card it is moving to
 
                             //where it is moving from
-                            onDeckCurrentNumberChange(card.deckLocation, currentIndex, deckInfos[card.deckLocation][currentIndex].currentCardsInDeck)
+                            onDeckCurrentNumberChange(card.deckLocation, currentDeckIndex, deckInfos[card.deckLocation][currentDeckIndex].currentCardsInDeck)
 
                             //where it is moving to
                             onDeckCurrentNumberChange(card.deckLocation, Number(specificDeckIndex), currentCardsInDeck);

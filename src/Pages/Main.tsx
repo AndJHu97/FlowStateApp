@@ -14,101 +14,156 @@ interface DeckInfo {
     }
 }
 
+interface Card {
+    id: string;
+    location: string;
+    subCards?: { [key: string]: any[] }; // Use this to hold subCards keyed by subCardType
+}
 
-
+interface AllCards {
+    [deckType: string]: Card[]; // Each deck type maps to an array of Card objects
+}
 
 function Main() {
-    // Define the type of card data you're expecting
-    const cardData = SeparateCardsToDecks('Hint', '');
-    //this saves all the personal cards in parameter subKey
-    var allPersonalCards = SeparateCardsToDecks('Hint', 'Personal')
+    const [cardData, setCardData] = useState<AllCards | null>(null);
+    const [allPersonalCards, setAllPersonalCards] = useState<AllCards | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [deckInfo, setDeckInfo] = useState<{ [key: string]: DeckInfo }>({});
+    const [subCardDecks, setSubCardDecks] = useState<AllCards | null>(null); // To store subCard decks
     const navigate = useNavigate();
 
-    // After defining allPersonalCards
-    const firstDeckType = Object.keys(allPersonalCards)[0]; // Get the first deck type
-    const firstCard = allPersonalCards[firstDeckType]?.[0]; // Get the first card
-
-    // Retrieve the Personal key if it exists. In future need to find better way to access these
-    const personalKey = firstCard?.subCards;
-    
-    //const [deckCallbacks, setDeckCallbacks] = useState<{ [key: string]: (cardId: string) => void }>({});
-    //const [deckPositions, setDeckPositions] = useState<{ [key: string]: DOMRect[] }>({});
-
-    const [deckInfo, setDeckInfo] = useState<{ 
-        [key: string]: DeckInfo
-    }>({});
     const goToNewCardPage = () => {
         navigate('/new-card');
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const hintCards = await SeparateCardsToDecks('Hint', '');
+                setCardData(hintCards);
+                const personalCards = await SeparateCardsToDecks('Hint', 'Personal');
+                setAllPersonalCards(personalCards);
+            } catch (error) {
+                console.error('Error fetching card data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    // Extract subCards and organize them into new decks
+    //not working
+    useEffect(() => {
+        if (allPersonalCards) {
+            const extractedSubCardDecks: AllCards = {};
+
+            Object.entries(allPersonalCards).forEach(([deckType, cards]) => {
+                cards.forEach((card) => {
+                    if (card.subCards) {
+                        Object.entries(card.subCards).forEach(([subCardType, subCards]) => {
+                            if(subCards.length != 0){
+                                if (!extractedSubCardDecks[subCardType]) {
+                                    extractedSubCardDecks[subCardType] = [];
+                                }
+                                console.log("subCardType: " + subCardType);
+                                extractedSubCardDecks[subCardType].push(...subCards);
+                            }
+                            
+                        });
+                    }
+                });
+            });
+
+            setSubCardDecks(extractedSubCardDecks);
+        }
+    }, [allPersonalCards]);
+
+    useEffect(() =>{
+        console.log("sub cards: " + subCardDecks);
+    }, [subCardDecks])
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    //I think this stores all the position of all the decks
+    if (!cardData || !allPersonalCards) {
+        return <div>No card data available</div>;
+    }
+
     const handleDeckPositionChange = (deckID: string, index: number, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => {
-        setDeckInfo(prevPositions => {
+        setDeckInfo((prevPositions) => {
             const currentDeckInfo = prevPositions[deckID] || {};
-            
-            //retrieve the index of the specific deck of that type (like deck 2 of Ego deck)
-            const currentDeck = currentDeckInfo[index] || {
-                rect: null,
-                currentCardsInDeck: currentCardsInDeck,
-                maxCardsInDeck: maxCardsInDeck
-            }
 
             return {
                 ...prevPositions,
                 [deckID]: {
                     ...currentDeckInfo,
                     [index]: {
-                    ...currentDeck,
-                    rect: rect, // Update the rect array
-                    currentCardsInDeck: currentCardsInDeck, // Update the currentCardsInDeck
-                    maxCardsInDeck: maxCardsInDeck // Update the maxCardsInDeck
-                    }
-                }
+                        rect,
+                        currentCardsInDeck,
+                        maxCardsInDeck,
+                    },
+                },
             };
         });
     };
 
-    //cards in the deck
-    const onDeckCurrentNumberChange = (deckID: string, index: number, currentCardsInDeck: number) => {
-        setDeckInfo(prevPositions =>{
-            const currentDeckInfo = prevPositions[deckID]
-            const currentDeck = currentDeckInfo[index]
+    const onDeckCurrentNumberChange = (deckID: string, deckIndex: number, currentCardsInDeck: number) => {
+        setDeckInfo((prevPositions) => {
+            const currentDeckInfo = prevPositions[deckID] || {};
             return {
                 ...prevPositions,
                 [deckID]: {
                     ...currentDeckInfo,
-                    [index]: {
-                    ...currentDeck,
-                    currentCardsInDeck: currentCardsInDeck, // Update the currentCardsInDeck
-                    }
-                }
+                    [deckIndex]: {
+                        ...currentDeckInfo[deckIndex],
+                        currentCardsInDeck,
+                    },
+                },
             };
-        })
-    }
+        });
+    };
 
     return (
         <div className="container">
-        <nav>
-            <Button onClick={goToNewCardPage}>Add New Card</Button>
-        </nav>
+            <nav>
+                <Button onClick={goToNewCardPage}>Add New Card</Button>
+            </nav>
 
-        {Object.keys(cardData).map((deckLocation, index) => (
-            <Deck key={deckLocation} cardData = {cardData} deckID = {deckLocation} maxCardsInDeck={1} maxCardsToLoad={1} index = {index} onDeckCurrentNumberChange={onDeckCurrentNumberChange} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
-        ))}
+            {/* Render main card decks */}
+            {Object.keys(cardData).map((deckLocation, index) => (
+                <Deck
+                    key={deckLocation}
+                    cardData={cardData}
+                    deckID={deckLocation}
+                    maxCardsInDeck={1}
+                    maxCardsToLoad={1}
+                    deckIndex={index}
+                    onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                    deckInfos={deckInfo}
+                    onDeckPositionChange={handleDeckPositionChange}
+                />
+            ))}
 
-        {Object.keys(cardData).map((deckType, index) => (
-            <Deck key={deckType} cardData = {cardData} deckID = {deckType} maxCardsInDeck={2} maxCardsToLoad={1} index = {index + 2} onDeckCurrentNumberChange={onDeckCurrentNumberChange} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
-        ))}
-
-        {personalKey && Object.keys(personalKey).map((deckType, index) => (
-            <Deck key={deckType} cardData={personalKey} deckID={deckType} maxCardsInDeck={1} maxCardsToLoad={1} index={index} onDeckCurrentNumberChange={onDeckCurrentNumberChange} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
-        ))}
-
-        {personalKey && Object.keys(personalKey).map((deckType, index) => (
-            <Deck key={deckType} cardData={personalKey} deckID={deckType} maxCardsInDeck={3} maxCardsToLoad={2} index={index} onDeckCurrentNumberChange={onDeckCurrentNumberChange} deckInfos={deckInfo} onDeckPositionChange={handleDeckPositionChange}/>
-        ))}
-        
-    </div>
+            {/* Render subCard decks */}
+            {subCardDecks &&
+                Object.keys(subCardDecks).map((deckLocation, index) => (
+                    <Deck
+                        key={deckLocation}
+                        cardData={subCardDecks}
+                        deckID={deckLocation}
+                        maxCardsInDeck={2}
+                        maxCardsToLoad={2}
+                        deckIndex={index}
+                        onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                        deckInfos={deckInfo}
+                        onDeckPositionChange={handleDeckPositionChange}
+                    />
+                ))}
+        </div>
     );
 }
 

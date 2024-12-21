@@ -34,7 +34,7 @@ const CardLoadingArea: React.FC<CardLoadingProps> = ({ onDeckPositionChange}) =>
   return (
  
       <div className="card-container" ref = {loadingAreaRef} style={{ border: '5px solid #ccc', borderRadius: '5px', padding: '10px', display: 'inline-block' }}>
-         <div className="card" style={{ width: '200px', height: '500px', border: '0px' }}>
+         <div className="card" style={{ width: '170px', height: '360px', border: '0px' }}>
             
          </div>
       </div>
