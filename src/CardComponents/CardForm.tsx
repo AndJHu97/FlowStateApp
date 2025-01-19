@@ -61,62 +61,62 @@ const CardForm: React.FC<CardFormProps> = ({ onClose, parentCardLocation, cardTy
 
     return (
         <div >
-                <button onClick={onClose} className="close-btn">&times;</button>
-                <h2>Add New Card</h2>
-                <Form onSubmit={onSubmit}>
-                    <Form.Group controlId="formTitle">
-                        <Form.Label>Title</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formDescription">
-                        <Form.Label>Description</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formNote">
-                        <Form.Label>Note</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter note"
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formImage">
-                        <Form.Label>Image</Form.Label>
-                        <Form.Control
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formType">
-                        <Form.Label>Card Type</Form.Label>
-                        <Form.Control
-                            as="select"
-                            value={cardType}
-                            disabled={true}
-                        >
-                            <option value="">
-                                {"Only one type available"}
-                            </option>
-                            <option value={cardType}>{cardType}</option>
-                        </Form.Control>
-                    </Form.Group>
-                    <Button variant="primary" type="submit">
-                        Save Card
-                    </Button>
-                </Form>
-            </div>
+            <button onClick={onClose} className="close-btn">&times;</button>
+            <h2>Add New Card</h2>
+            <Form onSubmit={onSubmit}>
+                <Form.Group controlId="formTitle">
+                    <Form.Label>Title</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                </Form.Group>
+                <Form.Group controlId="formDescription">
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
+                </Form.Group>
+                <Form.Group controlId="formNote">
+                    <Form.Label>Note</Form.Label>
+                    <Form.Control
+                        type="text"
+                        placeholder="Enter note"
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                    />
+                </Form.Group>
+                <Form.Group controlId="formImage">
+                    <Form.Label>Image</Form.Label>
+                    <Form.Control
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                    />
+                </Form.Group>
+                <Form.Group controlId="formType">
+                    <Form.Label>Card Type</Form.Label>
+                    <Form.Control
+                        as="select"
+                        value={cardType}
+                        disabled={true}
+                    >
+                        <option value="">
+                            {"Only one type available"}
+                        </option>
+                        <option value={cardType}>{cardType}</option>
+                    </Form.Control>
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                    Save Card
+                </Button>
+            </Form>
+        </div>
     );
 };
 

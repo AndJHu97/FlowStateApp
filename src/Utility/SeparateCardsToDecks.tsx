@@ -5,6 +5,7 @@ import { database } from '../firebase';
 interface Card {
     id: string;
     location: string;
+    Personal?:{ [key: string]: Card }; 
     subCards?: { [key: string]: any[] }; // Use this to hold subCards keyed by subCardType
 }
 
@@ -31,7 +32,6 @@ const SeparateCardsByDecks = async (cardType: string, subCardType: string) : Pro
             const categoryKeys = Object.keys(data);
             //go through all types/decks i.e. act, ego, prey, etc.
             for (const categoryKey of categoryKeys) {
-                //console.log(`Processing key: ${categoryKey}`);
                 //get all the cards of category type with cardType
                 //i.e. hint. CardType = hint
                 const cardsInKeyRef = databaseRef(database, `/${categoryKey}/${cardType}`);
@@ -66,7 +66,6 @@ const SeparateCardsByDecks = async (cardType: string, subCardType: string) : Pro
                         Object.keys(cardsInDeckType).forEach(cardKey => {
                             //the cards in Deck
                             const cardInCardType = cardsInDeckType[cardKey];
-
                             // Check if the subCardType exists in the current card
                             if (cardInCardType[subCardType]) {
                                 // Loop through each key inside the subCardType object
@@ -79,8 +78,10 @@ const SeparateCardsByDecks = async (cardType: string, subCardType: string) : Pro
                                     });
                                 });
                             }
-                            console.log("accessing the sub cards: " + subCardType);
+                            //console.log("accessing the sub cards: " + subCardType);
                             //thie is the location of the subcard deck (i.e. inside a hint card it is under personal)
+
+
                             subCards[`/${categoryKey}/${cardType}/${cardKey}/${subCardType}`] = subCardData;
 
                             //get all the cards in deck with formatted data
@@ -92,9 +93,11 @@ const SeparateCardsByDecks = async (cardType: string, subCardType: string) : Pro
                                 ...cardsInDeckType[cardKey] //rest of the data of the card
                             };
                             // Push the formatted card data to the array
+
+                            
                             formattedCards.push(cardData);
                         });
-                        
+
 
                         // Organize by deck type (location of deck) with filtered cards
                         allCards[`/${categoryKey}/${cardType}`] = formattedCards;
