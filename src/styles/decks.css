@@ -22,8 +22,18 @@
 .cards-container {
     display: flex;
     flex-direction: column;
+    flex-wrap: nowrap; /* Prevent wrapping */
     align-items: center;
     width: 100%;
     height: 100%;
-    overflow-y: auto; /* Allows vertical scrolling if cards overflow */
+    
 }
+
+.deck-row {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping if too many decks */
+    justify-content: center; /* Centers decks horizontally */
+    gap: 20px; /* Spacing between decks */
+    margin-bottom: 20px; /* Space between rows */
+}
+

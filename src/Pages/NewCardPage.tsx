@@ -3,7 +3,7 @@ import { Button, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 //rtdatabase
 import { ref as databaseRef, set, push, get,child} from 'firebase/database';
-import { database } from '../firebase';
+import { database, auth } from '../firebase';
 import {storage} from "../firebase";
 //storage
 import {ref as storageRef, uploadBytes, getDownloadURL} from "firebase/storage";
@@ -61,41 +61,48 @@ const NewCardPage: React.FC = () => {
             return;
         }
         try{
-        //access firebase
-        //get to folder cardImages then make random name with v4()
-        storedImageRef = storageRef(storage, `cardImages/${image.name + v4()}`);
-        //upload image to the firebase storage location. Await: Wait to finish uploading or else I might get the URL of something that doesn't exist (getDownloadURL)
-        await uploadBytes(storedImageRef, image).then(() =>{
-            console.log("Image uploaded");
-        });
+            const user = auth.currentUser;
 
-        // Get download URL in firebase for the uploaded image from firebase. 
-        imageURL = await getDownloadURL(storedImageRef);
-        //get the new entry location for firebase in saving for this card
-        const newCardRef = databaseRef(database, `${categoryType}/${selectedCardType}/${v4()}`);
-        //save json card in firestore realtime database
-        const newCard = {
-            title,
-            description,
-            note,
-            categoryType: categoryType,
-            cardType: selectedCardType,
-            image: imageURL || '' 
-        };
-        console.log(newCard);
-        await set(newCardRef, newCard);
-        } catch(error){
-            console.error('Error saving card:', error);
-        }
-        //Delete below because will not save locally
-        /*
-        try {
-            window.cardData.saveCard(newCard);
-            console.log('Card saved successfully!');
-        } catch (error) {
-            console.error('Error saving card:', error);
-        }
-        */
+            if (!user){
+                console.error("No user logged in.");
+                return;
+            }
+
+            //access firebase
+            //get to folder cardImages then make random name with v4()
+            storedImageRef = storageRef(storage, `cardImages/${image.name + v4()}`);
+            //upload image to the firebase storage location. Await: Wait to finish uploading or else I might get the URL of something that doesn't exist (getDownloadURL)
+            await uploadBytes(storedImageRef, image).then(() =>{
+                console.log("Image uploaded");
+            });
+
+            // Get download URL in firebase for the uploaded image from firebase. 
+            imageURL = await getDownloadURL(storedImageRef);
+            //get the new entry location for firebase in saving for this card
+            const newCardRef = databaseRef(database, `users/${user.uid}/decks/${categoryType}/${selectedCardType}/${v4()}`);
+            //save json card in firestore realtime database
+            const newCard = {
+                title,
+                description,
+                note,
+                categoryType: categoryType,
+                cardType: selectedCardType,
+                image: imageURL || '' 
+            };
+            console.log(newCard);
+            await set(newCardRef, newCard);
+            } catch(error){
+                console.error('Error saving card:', error);
+            }
+            //Delete below because will not save locally
+            /*
+            try {
+                window.cardData.saveCard(newCard);
+                console.log('Card saved successfully!');
+            } catch (error) {
+                console.error('Error saving card:', error);
+            }
+            */
     };
 
     const goToMainPage = () => {

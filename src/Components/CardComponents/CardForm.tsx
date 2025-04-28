@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import '../styles/CardForm.css';
+import '../../styles/CardForm.css';
 
 // Firebase imports
 import { ref as databaseRef, set, push, get, child } from 'firebase/database';
-import { database } from '../firebase';
-import { storage } from "../firebase";
+import { database } from '../../firebase';
+import { storage } from "../../firebase";
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 } from "uuid";
 
@@ -21,7 +21,7 @@ const CardForm: React.FC<CardFormProps> = ({ onClose, parentCardLocation, cardTy
     const [description, setDescription] = useState('');
     const [note, setNote] = useState('');
     const [image, setImage] = useState<File | null>(null);
-
+    console.log("Card location: ", parentCardLocation);
     // Handle image upload
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {

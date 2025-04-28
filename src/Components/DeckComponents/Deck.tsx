@@ -1,8 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import CreateableCard from "../CardComponents/CreateableCard";
 import LoadingArea from "./CardLoadingArea";
-import '../styles/decks.css'
+import '../../styles/Main.css'
 import DraggableCard from '../CardComponents/DraggableCard';
+import { DeckContext } from '../../Contexts/DeckContext';
 
 interface DeckInfo {
     [index: number]:{
@@ -17,6 +18,7 @@ interface DeckInfo {
 interface DeckProps{
     deckID: string,
     deckIndex: number,
+    deckName: string,
     cardData: { [key: string]: any[]}
     deckInfos: { [key: string]: DeckInfo }; // Use the DeckInfo interface here
     maxCardsInDeck?: number | null;
@@ -25,7 +27,7 @@ interface DeckProps{
     onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
-const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, deckInfos: deckInfos, maxCardsInDeck = null, maxCardsToLoad = null, onDeckPositionChange, onDeckCurrentNumberChange}) =>
+const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, deckName, deckInfos: deckInfos, maxCardsInDeck = null, onDeckPositionChange, maxCardsToLoad = null, onDeckCurrentNumberChange}) =>
     {
         const deckRef = useRef<HTMLDivElement>(null);
 
@@ -33,6 +35,13 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
         const limitedMaxCardsToLoad = maxCardsInDeck != null ? Math.min(localMaxCardsToLoad, maxCardsInDeck) : localMaxCardsToLoad;
         const [cardsInDeck, setCardsInDeck] = useState<number>(limitedMaxCardsToLoad);
         var localCardInDeck = limitedMaxCardsToLoad;
+        const deckContext = useContext(DeckContext);
+        if(!deckContext){
+            throw new Error("DeckContext is not available");
+        }
+        const { setDeckInfo} = deckContext;
+
+
         useEffect(() => {
             console.log("cardsInDeck updated: ", cardsInDeck);
         }, [cardsInDeck]);
@@ -50,13 +59,32 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
                 x: rect.x + window.scrollX,
                 y: rect.y + window.scrollY
             };
+
+            /** 
+            setDeckInfo((prevPositions) => {
+                const currentDeckInfo = prevPositions[deckLocation] || {};
+    
+                return {
+                    ...prevPositions,
+                    [deckLocation]: {
+                        ...currentDeckInfo,
+                        [deckIndex]: {
+                            rect: adjustedRect,
+                            currentCardsInDeck: cardsInDeck,
+                            maxCardsInDeck: maxCardsInDeck,
+                        },
+                    },
+                };
+            });
+            */
+
             onDeckPositionChange(deckLocation, deckIndex, adjustedRect as DOMRect, cardsInDeck, maxCardsInDeck);
         }
         
 
         return (
             <div ref={deckRef} key={deckIndex} className="deck-section">
-                <h4>{cardData[deckLocation][0].categoryType} {cardData[deckLocation][0].cardType} Deck</h4>
+                <h4>{deckName} {cardData[deckLocation][0].categoryType}</h4>
                 <div className="cards-container">
                     <LoadingArea onDeckPositionChange={handleCardLoadingArea}/>
                     {cardData[deckLocation].slice(0, localMaxCardsToLoad).map((card) => (

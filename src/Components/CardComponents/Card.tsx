@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../styles/Card.css';
+import '../../styles/Card.css';
 
 interface CardProps {
   title: string;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SeparateCardsToDecks from "../Utility/SeparateCardsToDecks";
-import Deck from "../Deck/Deck";
+import Deck from "../Components/DeckComponents/Deck";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button } from 'react-bootstrap';
 import '../styles/decks.css'
+import {DeckContext} from '../Contexts/DeckContext';
 
 interface DeckInfo {
     [index: number]:{
@@ -30,7 +31,6 @@ function Main() {
     const [allPersonalCards, setAllPersonalCards] = useState<AllCards | null>(null);
     const [loading, setLoading] = useState(true);
     const [deckInfo, setDeckInfo] = useState<{ [key: string]: DeckInfo }>({});
-    const [subCardDecks, setSubCardDecks] = useState<AllCards | null>(null); // To store subCard decks
     const navigate = useNavigate();
 
     const goToNewCardPage = () => {
@@ -54,34 +54,6 @@ function Main() {
 
         fetchData();
     }, []);
-
-    // Extract subCards and organize them into new decks
-    //not working
-    //DELETE BELOW. Processing with other way
-    useEffect(() => {
-        if (allPersonalCards) {
-            const extractedSubCardDecks: AllCards = {};
-
-            Object.entries(allPersonalCards).forEach(([deckType, cards]) => {
-                cards.forEach((card) => {
-                    if (card.subCards) {
-                        Object.entries(card.subCards).forEach(([subCardType, subCards]) => {
-                            if(subCards.length !== 0){
-                                if (!extractedSubCardDecks[subCardType]) {
-                                    extractedSubCardDecks[subCardType] = [];
-                                }
-                                console.log("subCardType: " + subCardType);
-                                extractedSubCardDecks[subCardType].push(...subCards);
-                            }
-                            
-                        });
-                    }
-                });
-            });
-
-            setSubCardDecks(extractedSubCardDecks);
-        }
-    }, [allPersonalCards]);
 
 
     //1. Get 1 random hint card
@@ -190,38 +162,65 @@ function Main() {
                 <Button onClick={goToNewCardPage}>Add New Card</Button>
             </nav>
 
-            {/* Render main card decks */}
-            {Object.keys(organizedHintCards).map((deckLocation, index) => (
-                <Deck
-                    key={deckLocation}
-                    cardData={cardData}
-                    deckID={deckLocation}
-                    maxCardsInDeck={1}
-                    maxCardsToLoad={1}
-                    deckIndex={index}
-                    onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                    deckInfos={deckInfo}
-                    onDeckPositionChange={handleDeckPositionChange}
-                />
-            ))}
-
-            {/* Render subCard decks */}
-            {organizedPersonalCards &&
-                Object.keys(organizedPersonalCards).map((deckLocation, index) => (
-                    <Deck
-                        key={deckLocation}
-                        cardData={cardDataWithSubCards}
-                        deckID={deckLocation}
-                        maxCardsInDeck={2}
-                        maxCardsToLoad={2}
-                        deckIndex={index}
-                        onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                        deckInfos={deckInfo}
-                        onDeckPositionChange={handleDeckPositionChange}
-                    />
+            <div className="decks-container"> {/* Wrap all decks */}
+                {Object.keys(organizedHintCards).map((deckLocation, index) => (
+                    <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
+                        <Deck
+                            key={deckLocation}
+                            cardData={cardData}
+                            deckID={deckLocation}
+                            deckName="Daily"
+                            maxCardsInDeck={5}
+                            maxCardsToLoad={3}
+                            deckIndex={index}
+                            onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                            deckInfos={deckInfo}
+                            onDeckPositionChange={handleDeckPositionChange}
+                        />
+                    </DeckContext.Provider>
                 ))}
+
+                {Object.keys(organizedHintCards).map((deckLocation, index) => (
+                    <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
+                        <Deck
+                            key={deckLocation}
+                            cardData={cardData}
+                            deckID={deckLocation}
+                            deckName="Daily"
+                            maxCardsInDeck={5}
+                            maxCardsToLoad={3}
+                            deckIndex={index}
+                            onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                            deckInfos={deckInfo}
+                            onDeckPositionChange={handleDeckPositionChange}
+                        />
+                    </DeckContext.Provider>
+                ))}
+            </div>
+
+            <div className="decks-container"> {/* Wrap all personal decks */}
+                {organizedPersonalCards &&
+                    Object.keys(organizedPersonalCards).map((deckLocation, index) => (
+                        <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
+                            <Deck
+                                key={deckLocation}
+                                cardData={cardDataWithSubCards}
+                                deckID={deckLocation}
+                                deckName="Past"
+                                maxCardsInDeck={2}
+                                maxCardsToLoad={2}
+                                deckIndex={index}
+                                onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                                deckInfos={deckInfo}
+                                onDeckPositionChange={handleDeckPositionChange}
+                            />
+                        </DeckContext.Provider>
+                    ))}
+            </div>
         </div>
+
     );
+    
 }
 
 export default Main;
