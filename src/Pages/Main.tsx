@@ -175,7 +175,7 @@ function Main() {
                             deckIndex={index}
                             onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                             deckInfos={deckInfo}
-                            onDeckPositionChange={handleDeckPositionChange}
+                            //onDeckPositionChange={handleDeckPositionChange}
                         />
                     </DeckContext.Provider>
                 ))}
@@ -192,7 +192,7 @@ function Main() {
                             deckIndex={index}
                             onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                             deckInfos={deckInfo}
-                            onDeckPositionChange={handleDeckPositionChange}
+                            //onDeckPositionChange={handleDeckPositionChange}
                         />
                     </DeckContext.Provider>
                 ))}
@@ -212,7 +212,7 @@ function Main() {
                                 deckIndex={index}
                                 onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                                 deckInfos={deckInfo}
-                                onDeckPositionChange={handleDeckPositionChange}
+                                //onDeckPositionChange={handleDeckPositionChange}
                             />
                         </DeckContext.Provider>
                     ))}
