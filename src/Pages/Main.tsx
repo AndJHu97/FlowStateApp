@@ -18,7 +18,7 @@ interface DeckInfo {
 interface Card {
     id: string;
     location: string;
-    Personal?:{ [key: string]: Card }; 
+    Personal?:{ [key: string]: any }; 
     subCards?: { [key: string]: any[] }; // Use this to hold subCards keyed by subCardType
 }
 
@@ -55,6 +55,10 @@ function Main() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        console.log("Card Data: ", cardData);
+    }, [cardData])
+
 
     //1. Get 1 random hint card
     //2. Get the personal cards from the 1 hint card
@@ -82,8 +86,8 @@ function Main() {
                     const randomSubCard = subCardsInHintCard[randomSubCardKey];
                 
                     //deck location or key
-                    //I have to remake the deck location because my subCards (which has the location) isn't storing properly. subCards are storing all the subCards not only in the hint cards
-                    const subCardLocation = randomHintCard.location + "/Personal/" + randomSubCardKey;
+                    console.log("Sub card data: ", subCardsInHintCard[randomSubCardKey]);
+                    const subCardLocation = randomSubCard.categoryType + "/" + randomSubCard.cardType;
                     // Ensure the allCardData structure is correctly initialized
                     if (!allCardData[subCardLocation]) {
                         allCardData[subCardLocation] = [];
@@ -95,6 +99,7 @@ function Main() {
                         return; // Skip adding this subcard
                     } else {
                         // If subCardLocation does not exist, add the subcard
+                        console.log("Sub card location: ", subCardLocation);
                         personalCards[subCardLocation] = randomSubCard;
                     }
 
@@ -155,6 +160,8 @@ function Main() {
             };
         });
     };
+    
+  
 
     return (
         <div className="container">
@@ -162,61 +169,60 @@ function Main() {
                 <Button onClick={goToNewCardPage}>Add New Card</Button>
             </nav>
 
-            <div className="decks-container"> {/* Wrap all decks */}
-                {Object.keys(organizedHintCards).map((deckLocation, index) => (
-                    <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
-                        <Deck
-                            key={deckLocation}
-                            cardData={cardData}
-                            deckID={deckLocation}
-                            deckName="Daily"
-                            maxCardsInDeck={5}
-                            maxCardsToLoad={3}
-                            deckIndex={index}
-                            onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                            deckInfos={deckInfo}
-                            //onDeckPositionChange={handleDeckPositionChange}
-                        />
-                    </DeckContext.Provider>
-                ))}
+            <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
 
-                {Object.keys(organizedHintCards).map((deckLocation, index) => (
-                    <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
-                        <Deck
-                            key={deckLocation}
-                            cardData={cardData}
-                            deckID={deckLocation}
-                            deckName="Daily"
-                            maxCardsInDeck={5}
-                            maxCardsToLoad={3}
-                            deckIndex={index}
-                            onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                            deckInfos={deckInfo}
-                            //onDeckPositionChange={handleDeckPositionChange}
-                        />
-                    </DeckContext.Provider>
-                ))}
-            </div>
-
-            <div className="decks-container"> {/* Wrap all personal decks */}
-                {organizedPersonalCards &&
-                    Object.keys(organizedPersonalCards).map((deckLocation, index) => (
-                        <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
+                <div className="decks-container"> {/* Wrap all decks */}
+                    {Object.keys(organizedHintCards).map((deckLocation, index) => (
                             <Deck
                                 key={deckLocation}
-                                cardData={cardDataWithSubCards}
+                                cardData={cardData}
                                 deckID={deckLocation}
-                                deckName="Past"
-                                maxCardsInDeck={2}
-                                maxCardsToLoad={2}
+                                deckName="Daily"
+                                maxCardsInDeck={5}
+                                maxCardsToLoad={3}
                                 deckIndex={index}
                                 onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                                deckInfos={deckInfo}
+                                //deckInfos={deckInfo}
                                 //onDeckPositionChange={handleDeckPositionChange}
                             />
-                        </DeckContext.Provider>
                     ))}
-            </div>
+
+                    {Object.keys(organizedHintCards).map((deckLocation, index) => (
+                        
+                            <Deck
+                                key={deckLocation}
+                                cardData={cardData}
+                                deckID={deckLocation}
+                                deckName="Test"
+                                maxCardsInDeck={5}
+                                maxCardsToLoad={3}
+                                deckIndex={index + 2}
+                                onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                                //deckInfos={deckInfo}
+                                //onDeckPositionChange={handleDeckPositionChange}
+                            />
+                    ))}
+                </div>
+
+                <div className="decks-container"> {/* Wrap all personal decks */}
+                    {organizedPersonalCards &&
+                        Object.keys(organizedPersonalCards).map((deckLocation, index) => (
+                            
+                                <Deck
+                                    key={deckLocation}
+                                    cardData={cardDataWithSubCards}
+                                    deckID={deckLocation}
+                                    deckName="Past"
+                                    maxCardsInDeck={2}
+                                    maxCardsToLoad={2}
+                                    deckIndex={index}
+                                    onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                                    //deckInfos={deckInfo}
+                                    //onDeckPositionChange={handleDeckPositionChange}
+                                />
+                        ))}
+                </div>
+            </DeckContext.Provider>
         </div>
 
     );

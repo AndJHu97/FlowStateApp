@@ -45,16 +45,16 @@ const SeparateCardsByDecks = async (cardType: string, subCardType: string): Prom
             const cardsInCategory = data[categoryKey][cardType];
 
             if (!cardsInCategory) continue;
-
-            allCards[categoryKey] = [];
+            const deckKey = categoryKey + "/" + cardType;
+            allCards[deckKey] = [];
 
             for (const cardID in cardsInCategory) {
                 const card = cardsInCategory[cardID];
 
                 // Check if subCards exist
                 const subCards = card[subCardType] ? Object.values(card[subCardType]) : [];
-
-                allCards[categoryKey].push({
+                
+                allCards[deckKey].push({
                     id: cardID,
                     location: `users/${user.uid}/decks/${categoryKey}/${cardType}/${cardID}`,
                     ...card,

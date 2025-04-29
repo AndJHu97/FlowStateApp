@@ -79,11 +79,14 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfo
     
 
     const snapToDeck = () => {
+        console.log("Card data: ", card);
         //issnapped makes it so after you snap it, it prevents it from running twice. Will reset snap = false when mouse up 
         if (isSnapped || !cardRef.current) return;
         const cardRect = cardRef.current.getBoundingClientRect();
         // Filter deck positions based on card type. i.e. act, ego, etc. Find the one based on this card that is moving
-        const sameDeckInfo = deckInfos[card.deckLocation] || {};
+        const deckKey = card.categoryType + "/" + card.cardType;
+        const sameDeckInfo = deckInfos[deckKey] || {};
+        console.log("Same deck info: ", sameDeckInfo);
         //console.log("sameDeckInfo: ");
         let snapped = false;
         // Snap to the closest deck
@@ -93,30 +96,31 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfo
             if (sameDeckInfo.hasOwnProperty(specificDeckIndex)) {
                 
                 const deckPosition = sameDeckInfo[specificDeckIndex].rect;
-                console.log("Deck position: " + sameDeckInfo[specificDeckIndex].maxCardsInDeck);
+                //console.log("Deck position: " + sameDeckInfo[specificDeckIndex].maxCardsInDeck);
                 if (isCloseToDeck(cardRect, deckPosition) && currentDeckIndex != Number(specificDeckIndex)) {
                     //Add snap feedback from the deck to see if hit card limit
-                    let maxCardsInDeck = deckInfos[card.deckLocation][specificDeckIndex].maxCardsInDeck
-                    let currentCardsInDeck = deckInfos[card.deckLocation][specificDeckIndex].currentCardsInDeck
-                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[card.deckLocation][currentDeckIndex].currentCardsInDeck);
-                    console.log("Current key of deck: " + currentDeckIndex);
+                    
+                    let maxCardsInDeck = deckInfos[deckKey][specificDeckIndex].maxCardsInDeck
+                    let currentCardsInDeck = deckInfos[deckKey][specificDeckIndex].currentCardsInDeck
+                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[deckKey][currentDeckIndex].currentCardsInDeck);
+                    //console.log("Current key of deck: " + currentDeckIndex);
                     if (maxCardsInDeck == null) {
                         snapped = true;
                     } else {
                         if (currentCardsInDeck < maxCardsInDeck) {
                             console.log("add number");
                             currentCardsInDeck += 1;
-                            deckInfos[card.deckLocation][specificDeckIndex].currentCardsInDeck = currentCardsInDeck
-                            deckInfos[card.deckLocation][currentDeckIndex].currentCardsInDeck -= 1
+                            deckInfos[deckKey][specificDeckIndex].currentCardsInDeck = currentCardsInDeck
+                            deckInfos[deckKey][currentDeckIndex].currentCardsInDeck -= 1
                             snapped = true;
                             
                             //change the values of the deck it is moving from and the card it is moving to
 
                             //where it is moving from
-                            onDeckCurrentNumberChange(card.deckLocation, currentDeckIndex, deckInfos[card.deckLocation][currentDeckIndex].currentCardsInDeck)
+                            onDeckCurrentNumberChange(deckKey, currentDeckIndex, deckInfos[deckKey][currentDeckIndex].currentCardsInDeck)
 
                             //where it is moving to
-                            onDeckCurrentNumberChange(card.deckLocation, Number(specificDeckIndex), currentCardsInDeck);
+                            onDeckCurrentNumberChange(deckKey, Number(specificDeckIndex), currentCardsInDeck);
 
                             //change specific deck index to new one you moved to
                             setCurrentIndex(Number(specificDeckIndex));
