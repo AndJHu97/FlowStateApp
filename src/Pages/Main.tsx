@@ -127,6 +127,8 @@ function Main() {
         return <div>No card data available</div>;
     }
 
+
+    //Don't need with deck context API
     const handleDeckPositionChange = (deckID: string, index: number, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => {
         setDeckInfo((prevPositions) => {
             const currentDeckInfo = prevPositions[deckID] || {};
@@ -145,6 +147,7 @@ function Main() {
         });
     };
 
+    //Need to work with deck context API
     const onDeckCurrentNumberChange = (deckID: string, deckIndex: number, currentCardsInDeck: number) => {
         setDeckInfo((prevPositions) => {
             const currentDeckInfo = prevPositions[deckID] || {};
@@ -178,10 +181,10 @@ function Main() {
                                 cardData={cardData}
                                 deckID={deckLocation}
                                 deckName="Daily"
-                                maxCardsInDeck={5}
+                                maxCardsInDeck={4}
                                 maxCardsToLoad={3}
                                 deckIndex={index}
-                                onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                                //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                                 //deckInfos={deckInfo}
                                 //onDeckPositionChange={handleDeckPositionChange}
                             />
@@ -194,10 +197,10 @@ function Main() {
                                 cardData={cardData}
                                 deckID={deckLocation}
                                 deckName="Test"
-                                maxCardsInDeck={5}
+                                maxCardsInDeck={3}
                                 maxCardsToLoad={3}
                                 deckIndex={index + 2}
-                                onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                                //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                                 //deckInfos={deckInfo}
                                 //onDeckPositionChange={handleDeckPositionChange}
                             />
@@ -216,7 +219,7 @@ function Main() {
                                     maxCardsInDeck={2}
                                     maxCardsToLoad={2}
                                     deckIndex={index}
-                                    onDeckCurrentNumberChange={onDeckCurrentNumberChange}
+                                    //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                                     //deckInfos={deckInfo}
                                     //onDeckPositionChange={handleDeckPositionChange}
                                 />

@@ -1,6 +1,7 @@
 // Get attributes of card moving events from mouse clicks 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import CreatableCard from "../CardComponents/CreateableCard";
+import { DeckContext } from '../../Contexts/DeckContext';
 
 interface DeckInfo {
     [index: number]:{
@@ -15,11 +16,11 @@ interface DraggableCardProps {
     card: any;
     deckIndex: number;
     deckInfos: { [key: string]: DeckInfo };
-    onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
+    //onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
 //index is to check where in the 
-const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfos, onDeckCurrentNumberChange }) => {
+const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfos }) => {
     const [isClicked, setIsClicked] = useState(false);
     //reference the card itself to access div or dom
     const cardRef = useRef<HTMLDivElement>(null);
@@ -27,6 +28,13 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfo
     const [initialPosition, setInitialPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
     const [currentDeckIndex, setCurrentIndex] = useState(Number);
     const [isSnapped, setIsSnapped] = useState(false);
+    //context API
+    const deckContext = useContext(DeckContext);
+        if(!deckContext){
+            throw new Error("DeckContext is not available");
+        }
+        const { deckInfo, setDeckInfo} = deckContext;
+
      // Capture the initial position of the card
      useEffect(() => {
         if (cardRef.current) {
@@ -156,6 +164,22 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfo
             cardRect.right + window.scrollX > deckRect.left - distance &&
             cardRect.left + window.scrollX < deckRect.right + distance
         );
+    };
+
+    const onDeckCurrentNumberChange = (deckID: string, deckIndex: number, currentCardsInDeck: number) => {
+        setDeckInfo((prevPositions) => {
+            const currentDeckInfo = prevPositions[deckID] || {};
+            return {
+                ...prevPositions,
+                [deckID]: {
+                    ...currentDeckInfo,
+                    [deckIndex]: {
+                        ...currentDeckInfo[deckIndex],
+                        currentCardsInDeck,
+                    },
+                },
+            };
+        });
     };
 
     useEffect(() => {
