@@ -148,6 +148,7 @@ function Main() {
     };
 
     //Need to work with deck context API
+    //I believe finished and don't need anymore
     const onDeckCurrentNumberChange = (deckID: string, deckIndex: number, currentCardsInDeck: number) => {
         setDeckInfo((prevPositions) => {
             const currentDeckInfo = prevPositions[deckID] || {};

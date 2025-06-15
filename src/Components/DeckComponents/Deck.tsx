@@ -85,7 +85,7 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
                 <div className="cards-container">
                     <LoadingArea onDeckPositionChange={handleCardLoadingArea}/>
                     {cardData[deckLocation].slice(0, localMaxCardsToLoad).map((card) => (
-                        <DraggableCard key={card.id} deckIndex = {deckIndex} card={card} deckInfos={deckInfo}/>
+                        <DraggableCard key={card.id} deckIndex = {deckIndex} card={card}/>
                     ))}
                 </div>
             </div>

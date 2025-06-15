@@ -15,12 +15,12 @@ interface DeckInfo {
 interface DraggableCardProps {
     card: any;
     deckIndex: number;
-    deckInfos: { [key: string]: DeckInfo };
+    //deckInfos: { [key: string]: DeckInfo };
     //onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
 //index is to check where in the 
-const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfos }) => {
+const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex }) => {
     const [isClicked, setIsClicked] = useState(false);
     //reference the card itself to access div or dom
     const cardRef = useRef<HTMLDivElement>(null);
@@ -93,7 +93,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfo
         const cardRect = cardRef.current.getBoundingClientRect();
         // Filter deck positions based on card type. i.e. act, ego, etc. Find the one based on this card that is moving
         const deckKey = card.categoryType + "/" + card.cardType;
-        const sameDeckInfo = deckInfos[deckKey] || {};
+        const sameDeckInfo = deckInfo[deckKey] || {};
         console.log("Same deck info: ", sameDeckInfo);
         //console.log("sameDeckInfo: ");
         let snapped = false;
@@ -108,9 +108,9 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfo
                 if (isCloseToDeck(cardRect, deckPosition) && currentDeckIndex != Number(specificDeckIndex)) {
                     //Add snap feedback from the deck to see if hit card limit
                     
-                    let maxCardsInDeck = deckInfos[deckKey][specificDeckIndex].maxCardsInDeck
-                    let currentCardsInDeck = deckInfos[deckKey][specificDeckIndex].currentCardsInDeck
-                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfos[deckKey][currentDeckIndex].currentCardsInDeck);
+                    let maxCardsInDeck = deckInfo[deckKey][specificDeckIndex].maxCardsInDeck
+                    let currentCardsInDeck = deckInfo[deckKey][specificDeckIndex].currentCardsInDeck
+                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfo[deckKey][currentDeckIndex].currentCardsInDeck);
                     //console.log("Current key of deck: " + currentDeckIndex);
                     if (maxCardsInDeck == null) {
                         snapped = true;
@@ -118,14 +118,14 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex, deckInfo
                         if (currentCardsInDeck < maxCardsInDeck) {
                             console.log("add number");
                             currentCardsInDeck += 1;
-                            deckInfos[deckKey][specificDeckIndex].currentCardsInDeck = currentCardsInDeck
-                            deckInfos[deckKey][currentDeckIndex].currentCardsInDeck -= 1
+                            deckInfo[deckKey][specificDeckIndex].currentCardsInDeck = currentCardsInDeck
+                            deckInfo[deckKey][currentDeckIndex].currentCardsInDeck -= 1
                             snapped = true;
                             
                             //change the values of the deck it is moving from and the card it is moving to
 
                             //where it is moving from
-                            onDeckCurrentNumberChange(deckKey, currentDeckIndex, deckInfos[deckKey][currentDeckIndex].currentCardsInDeck)
+                            onDeckCurrentNumberChange(deckKey, currentDeckIndex, deckInfo[deckKey][currentDeckIndex].currentCardsInDeck)
 
                             //where it is moving to
                             onDeckCurrentNumberChange(deckKey, Number(specificDeckIndex), currentCardsInDeck);
