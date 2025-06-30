@@ -1,12 +1,14 @@
 import React, {useState} from 'react';
 import '../../styles/DailyCard.css'
 import Card from './Card';
+import DraggableCard from './DraggableCard';
 
 interface DailyCardProps {
-
+    card: any;
+    onUnlock: (cardId: string) => void;
 }
 
-const DailyCard: React.FC<DailyCardProps> = () => {
+const DailyCard: React.FC<DailyCardProps> = ({card, onUnlock}) => {
     const [unlocked, setUnlocked] = useState<boolean>(false);
     const [focused, setFocused] = useState<boolean>(false);
 
@@ -17,16 +19,19 @@ const DailyCard: React.FC<DailyCardProps> = () => {
                 <div className="card-overlay">
                     <div
                         className='card-modal'
-                        onClick={() => setFocused(false)}
-
+                        onClick={() => {
+                            setFocused(false);
+                            onUnlock(card.id);
+                        }
+                    }
                     >
                         <Card
-                            title = {"Test"}
-                            image = {"https://opengameart.org/sites/default/files/card%20back%20red.png"}
-                            description = {"test"}
-                            note = {"test"}
-                            categoryType={"Act"}
-                            cardType={"Daily"}
+                            title = {card.title}
+                            image = {card.image}
+                            description = {card.description}
+                            note = {card.note}
+                            categoryType={card.categoryType}
+                            cardType={card.cardType}
 
                         />
 
@@ -35,23 +40,8 @@ const DailyCard: React.FC<DailyCardProps> = () => {
                 </div>
             );
         }else{
-            //Need to change this to a draggable card
-            return(
-                <div>
-                    <Card
-                            title = {"Test"}
-                            image = {"https://opengameart.org/sites/default/files/card%20back%20red.png"}
-                            description = {"test"}
-                            note = {"test"}
-                            categoryType={"Act"}
-                            cardType={"Daily"}
-
-                        />
-
-                </div>
-            )
+            return null;
         }
-        
     }else{
         return(
 
@@ -59,6 +49,10 @@ const DailyCard: React.FC<DailyCardProps> = () => {
             onClick = {() => {
                 setUnlocked(true)
                 setFocused(true)
+            }}
+            style={{
+                position: 'absolute',
+                cursor: 'pointer',
             }}
         >
             <Card

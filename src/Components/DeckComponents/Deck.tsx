@@ -4,6 +4,7 @@ import LoadingArea from "./CardLoadingArea";
 import '../../styles/Main.css'
 import DraggableCard from '../CardComponents/DraggableCard';
 import { DeckContext } from '../../Contexts/DeckContext';
+import DailyCard from '../CardComponents/DailyCard';
 
 interface DeckInfo {
     [index: number]:{
@@ -20,6 +21,7 @@ interface DeckProps{
     deckIndex: number,
     deckName: string,
     cardData: { [key: string]: any[]}
+    isHoldingDailyCard: boolean,
     //deckInfos: { [key: string]: DeckInfo }; // Use the DeckInfo interface here
     maxCardsInDeck?: number | null;
     maxCardsToLoad?: number | null;
@@ -27,14 +29,14 @@ interface DeckProps{
     //onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
-const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, deckName, maxCardsInDeck = null, maxCardsToLoad = null}) =>
+const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, deckName, isHoldingDailyCard = false, maxCardsInDeck = null, maxCardsToLoad = null}) =>
     {
         const deckRef = useRef<HTMLDivElement>(null);
-
         const localMaxCardsToLoad = maxCardsToLoad === null ? cardData[deckLocation].length : maxCardsToLoad;
         const numOfCardsLoaded = cardData[deckLocation].length;
-        
         const [cardsInDeck, setCardsInDeck] = useState<number>(numOfCardsLoaded);
+        const [unlockedCardIds, setUnlockedCardIds] = useState<Set<string>>(new Set());
+
         console.log("Deck location: " + deckLocation + " cards in deck " + numOfCardsLoaded);
         var localCardInDeck = numOfCardsLoaded;
         const deckContext = useContext(DeckContext);
@@ -73,7 +75,9 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
         }
 
 
-
+        const handleUnlock = (cardId: string) => {
+            setUnlockedCardIds(prev => new Set(prev).add(cardId))
+        }
         
         useEffect(() => {
             console.log("Deck Info in decks: ", deckInfo);
@@ -85,7 +89,11 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
                 <div className="cards-container">
                     <LoadingArea onDeckPositionChange={handleCardLoadingArea}/>
                     {cardData[deckLocation].slice(0, localMaxCardsToLoad).map((card) => (
-                        <DraggableCard key={card.id} deckIndex = {deckIndex} card={card}/>
+                        unlockedCardIds.has(card.id) || !isHoldingDailyCard ? (
+                            <DraggableCard key={card.id} deckIndex = {deckIndex} card={card}/>
+                        ) : (
+                            <DailyCard key={card.id} card={card} onUnlock={handleUnlock}/>
+                        )
                     ))}
                 </div>
             </div>

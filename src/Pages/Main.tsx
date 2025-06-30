@@ -185,6 +185,7 @@ function Main() {
                                 maxCardsInDeck={4}
                                 maxCardsToLoad={3}
                                 deckIndex={index}
+                                isHoldingDailyCard = {true}
                                 //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                                 //deckInfos={deckInfo}
                                 //onDeckPositionChange={handleDeckPositionChange}
@@ -201,6 +202,7 @@ function Main() {
                                 maxCardsInDeck={3}
                                 maxCardsToLoad={3}
                                 deckIndex={index + 2}
+                                isHoldingDailyCard = {true}
                                 //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                                 //deckInfos={deckInfo}
                                 //onDeckPositionChange={handleDeckPositionChange}
@@ -220,6 +222,7 @@ function Main() {
                                     maxCardsInDeck={2}
                                     maxCardsToLoad={2}
                                     deckIndex={index}
+                                    isHoldingDailyCard = {true}
                                     //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
                                     //deckInfos={deckInfo}
                                     //onDeckPositionChange={handleDeckPositionChange}

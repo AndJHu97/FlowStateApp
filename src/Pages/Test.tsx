@@ -3,8 +3,8 @@ import DailyCard from '../Components/CardComponents/DailyCard'
 
 function Test(){
     return(
-        <DailyCard/>
-            
+        //<DailyCard/>
+            <div></div>
     );
 }
 
