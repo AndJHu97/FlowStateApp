@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import SeparateCardsToDecks from "../Utility/SeparateCardsToDecks";
 import Deck from "../Components/DeckComponents/Deck";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Button } from 'react-bootstrap';
+import { Button, Nav } from 'react-bootstrap';
 import '../styles/decks.css'
 import {DeckContext} from '../Contexts/DeckContext';
+import NavBar from '../Components/NavBar';
+import '../output.css';
+
 
 interface DeckInfo {
     [index: number]:{
@@ -127,51 +130,22 @@ function Main() {
         return <div>No card data available</div>;
     }
 
-
-    //Don't need with deck context API
-    const handleDeckPositionChange = (deckID: string, index: number, rect: DOMRect, currentCardsInDeck: number, maxCardsInDeck: number | null) => {
-        setDeckInfo((prevPositions) => {
-            const currentDeckInfo = prevPositions[deckID] || {};
-
-            return {
-                ...prevPositions,
-                [deckID]: {
-                    ...currentDeckInfo,
-                    [index]: {
-                        rect,
-                        currentCardsInDeck,
-                        maxCardsInDeck,
-                    },
-                },
-            };
-        });
-    };
-
-    //Need to work with deck context API
-    //I believe finished and don't need anymore
-    const onDeckCurrentNumberChange = (deckID: string, deckIndex: number, currentCardsInDeck: number) => {
-        setDeckInfo((prevPositions) => {
-            const currentDeckInfo = prevPositions[deckID] || {};
-            return {
-                ...prevPositions,
-                [deckID]: {
-                    ...currentDeckInfo,
-                    [deckIndex]: {
-                        ...currentDeckInfo[deckIndex],
-                        currentCardsInDeck,
-                    },
-                },
-            };
-        });
-    };
     
   
 
     return (
+        <div>
+            <NavBar></NavBar>
         <div className="container">
+             
             <nav>
                 <Button onClick={goToNewCardPage}>Add New Card</Button>
             </nav>
+           
+           
+            <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text drop-shadow-lg">
+            Welcome to FlowState
+            </h1>
 
             <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
 
@@ -231,7 +205,7 @@ function Main() {
                 </div>
             </DeckContext.Provider>
         </div>
-
+        </div>
     );
     
 }

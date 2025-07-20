@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
 interface CardLoadingProps {
     onDeckPositionChange: (rect: DOMRect) => void;
 }
@@ -32,11 +33,15 @@ const CardLoadingArea: React.FC<CardLoadingProps> = ({ onDeckPositionChange}) =>
 
     
   return (
- 
-      <div className="card-container" ref = {loadingAreaRef} style={{ border: '5px solid #ccc', borderRadius: '5px', padding: '10px', display: 'inline-block' }}>
-         <div className="card" style={{ width: '170px', height: '360px', border: '0px' }}>
-            
-         </div>
+   
+      <div  ref = {loadingAreaRef} style={{ width: '100%',
+        height: '100%',
+        border: '5px solid #ccc',
+        borderRadius: '5px',
+        padding: '10px',
+        boxSizing: 'border-box', // include padding/border in size
+        display: 'inline-block',
+        }}>
       </div>
 
   );

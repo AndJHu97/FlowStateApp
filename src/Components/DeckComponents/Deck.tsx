@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import CreateableCard from "../CardComponents/CreateableCard";
 import LoadingArea from "./CardLoadingArea";
 import '../../styles/Main.css'
 import DraggableCard from '../CardComponents/DraggableCard';
@@ -83,10 +82,11 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
             console.log("Deck Info in decks: ", deckInfo);
         }, [deckInfo])
 
+        //Can change from daily card to draggable cards
         return (
             <div ref={deckRef} key={deckIndex} className="deck-section">
                 <h4>{deckName} {cardData[deckLocation][0].categoryType}</h4>
-                <div className="cards-container">
+                <div className="deck-cards-container">
                     <LoadingArea onDeckPositionChange={handleCardLoadingArea}/>
                     {cardData[deckLocation].slice(0, localMaxCardsToLoad).map((card) => (
                         unlockedCardIds.has(card.id) || !isHoldingDailyCard ? (

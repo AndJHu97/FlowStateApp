@@ -6,6 +6,7 @@
     overflow-x: auto;
 }
 
+/* stack the deck container vertically */
 .container {
     display: flex;
     flex-direction: column;

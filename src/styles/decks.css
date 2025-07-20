@@ -19,14 +19,15 @@
     overflow: hidden; /* Ensures cards don't overflow outside the deck */
 }
 
-.cards-container {
+/* THis is the overall card container in deck */
+.deck-cards-container {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap; /* Prevent wrapping */
     align-items: center;
-    width: 100%;
-    height: 100%;
-    
+    width: 12rem;
+    height: 25rem;
+
 }
 
 .deck-row {

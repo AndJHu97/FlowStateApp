@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import '../../styles/DailyCard.css'
 import Card from './Card';
-import DraggableCard from './DraggableCard';
+import CardBack from './CardBack';
 
 interface DailyCardProps {
     card: any;
@@ -44,7 +44,7 @@ const DailyCard: React.FC<DailyCardProps> = ({card, onUnlock}) => {
         }
     }else{
         return(
-
+            
         <div
             onClick = {() => {
                 setUnlocked(true)
@@ -52,19 +52,15 @@ const DailyCard: React.FC<DailyCardProps> = ({card, onUnlock}) => {
             }}
             style={{
                 position: 'absolute',
+                width: '12rem',
+                height: '21rem',
                 cursor: 'pointer',
+                border: '2px dashed red'
             }}
         >
-            <Card
-                title = {"Test"}
+            <CardBack
                 image = {"https://opengameart.org/sites/default/files/card%20back%20red.png"}
-                description = {"test"}
-                note = {"test"}
-                categoryType={"Act"}
-                cardType={"Daily"}
-
             />
-
         </div>
     );
     }
