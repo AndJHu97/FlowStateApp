@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, Nav } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 //rtdatabase
 import { ref as databaseRef, set, push, get,child} from 'firebase/database';
@@ -8,6 +8,7 @@ import {storage} from "../firebase";
 //storage
 import {ref as storageRef, uploadBytes, getDownloadURL} from "firebase/storage";
 import {v4} from "uuid";
+import NavBar from '../Components/NavBar';
 
 const NewCardPage: React.FC = () => {
     const [title, setTitle] = useState('');
@@ -110,78 +111,110 @@ const NewCardPage: React.FC = () => {
     };
 
     return (
-        <div className="container">
-            <nav>
-                <Button onClick={goToMainPage}>Main Page</Button>
-            </nav>
+        <div>
+            <NavBar />
 
-            <h2>Add New Card</h2>
-            <Form onSubmit={onSubmit}>
+            <div className="container mx-auto p-4 bg-white shadow-md rounded-lg mt-6">
+                <h2 className="text-2xl font-bold mb-4">Add New Card</h2>
+
+                <Form onSubmit={onSubmit} className="space-y-4">
                 <Form.Group controlId="formTitle">
-                    <Form.Label>Title</Form.Label>
+                    <Form.Label className="font-semibold">Title</Form.Label>
                     <Form.Control
-                        type="text"
-                        placeholder="Enter title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                    type="text"
+                    placeholder="Enter title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="mt-1 ml-2"
                     />
                 </Form.Group>
+
                 <Form.Group controlId="formDescription">
-                    <Form.Label>Description</Form.Label>
+                    <Form.Label className="font-semibold">Description</Form.Label>
                     <Form.Control
-                        type="text"
-                        placeholder="Enter description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                    type="text"
+                    placeholder="Enter description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="mt-1 ml-2"
                     />
                 </Form.Group>
+
                 <Form.Group controlId="formNote">
-                    <Form.Label>Note</Form.Label>
+                    <Form.Label className="font-semibold">Note</Form.Label>
                     <Form.Control
-                        type="text"
-                        placeholder="Enter note"
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
+                    type="text"
+                    placeholder="Enter note"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    className="mt-1 ml-2"
                     />
                 </Form.Group>
-                <Form.Group controlId="formImage">
-                    <Form.Label>Image</Form.Label>
-                    <Form.Control
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                    />
+
+                <Form.Group controlId="formImage" className="mb-4">
+                    <div className="flex items-center gap-4 mb-2">
+                    <Form.Label className="font-semibold">Image</Form.Label>
+
+                        <div className="relative inline-block">
+                            <label
+                            htmlFor="file-upload"
+                            className="cursor-pointer bg-gray-200 hover:bg-gray-300 text-black font-small py-1.5 px-2 rounded-lg shadow-sm hover:shadow-md transition duration-300"
+                            >
+                            Upload Image
+                            </label>
+
+                            <input
+                            id="file-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="absolute left-0 top-0 w-full h-full opacity-0 cursor-pointer"
+                            />
+                        </div>
+                        </div>
+
                 </Form.Group>
+
                 <Form.Group controlId="formType">
-                    <Form.Label>Flow Category Type</Form.Label>
+                    <Form.Label className="font-semibold">Flow Category Type</Form.Label>
                     <Form.Control
-                        as="select"
-                        value={categoryType}
-                        onChange={(e) => setCategoryType(e.target.value)}
+                    as="select"
+                    value={categoryType}
+                    onChange={(e) => setCategoryType(e.target.value)}
+                    className="mt-1 ml-2"
                     >
-                        <option value="">Select type</option>
-                        {rootKeys.map((key) => (
-                            <option key={key} value={key}>{key}</option>
-                        ))}
+                    <option value="">Select type</option>
+                    {rootKeys.map((key) => (
+                        <option key={key} value={key}>{key}</option>
+                    ))}
                     </Form.Control>
                 </Form.Group>
-                <Form.Group controlId="formType">
-                    <Form.Label>Card Type</Form.Label>
+
+                <Form.Group controlId="formCardType">
+                    <Form.Label className="font-semibold">Card Type</Form.Label>
                     <Form.Control
-                        as="select"
-                        value={selectedCardType}
-                        onChange={(e) => setSelectedCardType(e.target.value)}
+                    as="select"
+                    value={selectedCardType}
+                    onChange={(e) => setSelectedCardType(e.target.value)}
+                    className="mt-1 ml-2"
                     >
-                        <option value="">Select type</option>
-                        {cardTypes.map((cardType) => (
-                            <option key={cardType} value={cardType}>{cardType}</option>
-                        ))}
+                    <option value="">Select type</option>
+                    {cardTypes.map((cardType) => (
+                        <option key={cardType} value={cardType}>{cardType}</option>
+                    ))}
                     </Form.Control>
                 </Form.Group>
-                <Button variant="primary" type="submit">
-                    Save Card
+
+                <Button
+                    variant="primary"
+                    type="submit"
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold 
+                    py-2 px-6 rounded-xl shadow-md hover:shadow-lg transition duration-300 ease-in-out"
+                    >
+                Save Card
                 </Button>
-            </Form>
+                </Form>
+            </div>
         </div>
     );
 };

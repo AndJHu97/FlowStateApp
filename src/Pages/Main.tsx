@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SeparateCardsToDecks from "../Utility/SeparateCardsToDecks";
 import Deck from "../Components/DeckComponents/Deck";
-import 'bootstrap/dist/css/bootstrap.min.css';
+//import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Nav } from 'react-bootstrap';
 import '../styles/decks.css'
 import {DeckContext} from '../Contexts/DeckContext';
@@ -137,14 +137,10 @@ function Main() {
         <div>
             <NavBar></NavBar>
         <div className="container">
-             
-            <nav>
-                <Button onClick={goToNewCardPage}>Add New Card</Button>
-            </nav>
            
            
             <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text drop-shadow-lg">
-            Welcome to FlowState
+            Welcome to Flow State
             </h1>
 
             <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
