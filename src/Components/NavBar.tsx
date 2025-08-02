@@ -8,9 +8,10 @@ const NavBar = () => {
         <h1 className="text-white font-bold text-xl">Flow State</h1>
         <div className="flex space-x-12 p-2">
           <a href="/" className="mr-12 text-white hover:text-blue-200 transition-colors">Home</a>
-          <a href="/about" className="mr-12 text-white hover:text-blue-200 transition-colors">About</a>
-          <a href="/contact" className="mr-12 text-white hover:text-blue-200 transition-colors">Contact</a>
           <a href="/new-card" className="mr-12 text-white hover:text-blue-200 transition-colors">New Card</a>
+          <a href="/login" className="mr-12 text-white hover:text-blue-200 transition-colors">Login</a>
+          <a href="/sign-up" className="mr-12 text-white hover:text-blue-200 transition-colors">Sign-up</a>
+          <a href="/about" className="mr-12 text-white hover:text-blue-200 transition-colors">About</a>
         </div>
       </div>
     </nav>

@@ -5,6 +5,7 @@ import NewCardPage from './Pages/NewCardPage';
 import Test from './Pages/Test';
 import SignIn from './Components/auth/SignIn'
 import SignUp from './Components/auth/SignUp'
+import About from './Pages/About';
 
 const router = createBrowserRouter([
   {
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
     element: <NewCardPage />
   },
   {
-    path: '/sign-in',
+    path: '/login',
     element:<SignIn />,
   },
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: '/test',
     element: <Test />
+  },
+  {
+    path: '/about',
+    element: <About />
   }
 ]);
 

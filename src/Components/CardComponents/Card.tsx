@@ -29,10 +29,10 @@ const Card: React.FC<CardProps> = ({ title, image, description, note, categoryTy
             <p className="card-text text-gray-700">{description}</p>
             <h6 className="card-title-small text-md font-semibold text-gray-800">Notes</h6>
             <p className="card-text text-gray-700">{note}</p>
-            <p className="text-sm text-gray-600">
-              <span className="card-text font-semibold">Category Type:</span> {categoryType}
+            <p className="card-text text-sm text-gray-700">
+              <span className="font-semibold">Category:</span> {categoryType}
             </p>
-            <p className="card-text text-sm text-gray-600">
+            <p className="card-text text-sm text-gray-700">
               <span className="font-semibold">Card Type:</span> {cardType}
             </p>
             <div className="container" style={{ alignItems: "center" }}>

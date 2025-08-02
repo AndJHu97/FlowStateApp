@@ -34,11 +34,6 @@ function Main() {
     const [allPersonalCards, setAllPersonalCards] = useState<AllCards | null>(null);
     const [loading, setLoading] = useState(true);
     const [deckInfo, setDeckInfo] = useState<{ [key: string]: DeckInfo }>({});
-    const navigate = useNavigate();
-
-    const goToNewCardPage = () => {
-        navigate('/new-card');
-    };
 
     useEffect(() => {
         const fetchData = async () => {

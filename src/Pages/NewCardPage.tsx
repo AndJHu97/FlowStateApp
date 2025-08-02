@@ -9,6 +9,7 @@ import {storage} from "../firebase";
 import {ref as storageRef, uploadBytes, getDownloadURL} from "firebase/storage";
 import {v4} from "uuid";
 import NavBar from '../Components/NavBar';
+import '../output.css';
 
 const NewCardPage: React.FC = () => {
     const [title, setTitle] = useState('');
