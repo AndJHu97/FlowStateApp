@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SeparateCardsToDecks from "../Utility/SeparateCardsToDecks";
 import Deck from "../Components/DeckComponents/Deck";
 //import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Nav } from 'react-bootstrap';
 import '../styles/decks.css'
+
+//I think I set the deck context values in the decks, not here
 import {DeckContext} from '../Contexts/DeckContext';
 import NavBar from '../Components/NavBar';
 import '../output.css';
@@ -14,7 +16,8 @@ interface DeckInfo {
     [index: number]:{
         rect: DOMRect;
         maxCardsInDeck: number | null;
-        currentCardsInDeck: number;
+        currentNumOfCardsInDeck: number;
+        cardIDsOrderInDeck: number[];
     }
 }
 
@@ -34,6 +37,7 @@ function Main() {
     const [allPersonalCards, setAllPersonalCards] = useState<AllCards | null>(null);
     const [loading, setLoading] = useState(true);
     const [deckInfo, setDeckInfo] = useState<{ [key: string]: DeckInfo }>({});
+    const deckContext = useContext(DeckContext);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -125,6 +129,21 @@ function Main() {
         return <div>No card data available</div>;
     }
 
+    const handleLogDeckOrders = () => {
+    console.log("=== All Decks cardIDsOrderInDeck ===");
+    Object.keys(deckInfo).forEach((deckKey) => {
+        const decksInType = deckInfo[deckKey];
+        Object.keys(decksInType).forEach((index) => {
+            const deckData = decksInType[Number(index)];
+            console.log(
+                `DeckKey: ${deckKey}, Index: ${index}, cardIDsOrderInDeck:`,
+                deckData.cardIDsOrderInDeck
+            );
+        });
+    });
+};
+
+
     
   
 
@@ -137,7 +156,6 @@ function Main() {
             <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text drop-shadow-lg">
             Welcome to Flow State
             </h1>
-
             <DeckContext.Provider value = {{deckInfo, setDeckInfo}}>
 
                 <div className="decks-container"> {/* Wrap all decks */}
@@ -151,9 +169,6 @@ function Main() {
                                 maxCardsToLoad={3}
                                 deckIndex={index}
                                 isHoldingDailyCard = {true}
-                                //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                                //deckInfos={deckInfo}
-                                //onDeckPositionChange={handleDeckPositionChange}
                             />
                     ))}
 
@@ -168,9 +183,6 @@ function Main() {
                                 maxCardsToLoad={3}
                                 deckIndex={index + 2}
                                 isHoldingDailyCard = {true}
-                                //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                                //deckInfos={deckInfo}
-                                //onDeckPositionChange={handleDeckPositionChange}
                             />
                     ))}
                 </div>
@@ -188,11 +200,18 @@ function Main() {
                                     maxCardsToLoad={2}
                                     deckIndex={index}
                                     isHoldingDailyCard = {true}
-                                    //onDeckCurrentNumberChange={onDeckCurrentNumberChange}
-                                    //deckInfos={deckInfo}
-                                    //onDeckPositionChange={handleDeckPositionChange}
                                 />
                         ))}
+                </div>
+
+                {/* Button to log all deck orders */}
+                <div className="mt-6">
+                    <button
+                    onClick={handleLogDeckOrders}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md"
+                    >
+                    Log Deck Orders
+                    </button>
                 </div>
             </DeckContext.Provider>
         </div>

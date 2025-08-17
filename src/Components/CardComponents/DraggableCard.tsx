@@ -3,20 +3,10 @@ import React, { useRef, useState, useEffect, useContext } from 'react';
 import CreatableCard from "../CardComponents/CreateableCard";
 import { DeckContext } from '../../Contexts/DeckContext';
 
-interface DeckInfo {
-    [index: number]:{
-        rect: DOMRect;
-        maxCardsInDeck: number | null;
-        currentCardsInDeck: number;
-    }
-}
-
 
 interface DraggableCardProps {
     card: any;
     deckIndex: number;
-    //deckInfos: { [key: string]: DeckInfo };
-    //onDeckCurrentNumberChange: (deckType: string, index: number, currentCardsInDeck: number) => void;
 }
 
 //index is to check where in the 
@@ -100,38 +90,96 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex }) => {
         // Snap to the closest deck
         //iterate through the id aka location of the decks same as the cards
         //i.e. if act card, will check all act decks on the field
-        for (const specificDeckIndex in sameDeckInfo) {
-            if (sameDeckInfo.hasOwnProperty(specificDeckIndex)) {
+        for (const specificMovingToDeckIndex in sameDeckInfo) {
+            if (sameDeckInfo.hasOwnProperty(specificMovingToDeckIndex)) {
                 
-                const deckPosition = sameDeckInfo[specificDeckIndex].rect;
-                //console.log("Deck position: " + sameDeckInfo[specificDeckIndex].maxCardsInDeck);
-                if (isCloseToDeck(cardRect, deckPosition) && currentDeckIndex != Number(specificDeckIndex)) {
+                const deckPosition = sameDeckInfo[specificMovingToDeckIndex].rect;
+                if (isCloseToDeck(cardRect, deckPosition) && currentDeckIndex != Number(specificMovingToDeckIndex)) {
                     //Add snap feedback from the deck to see if hit card limit
-                    
-                    let maxCardsInDeck = deckInfo[deckKey][specificDeckIndex].maxCardsInDeck
-                    let currentCardsInDeck = deckInfo[deckKey][specificDeckIndex].currentCardsInDeck
-                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfo[deckKey][currentDeckIndex].currentCardsInDeck);
+                    let maxCardsInDeck = deckInfo[deckKey][specificMovingToDeckIndex].maxCardsInDeck
+                    let currentCardsInDeck = deckInfo[deckKey][specificMovingToDeckIndex].currentNumOfCardsInDeck
+                    console.log("number in moving deck: " + currentCardsInDeck + " number in current deck: " + deckInfo[deckKey][currentDeckIndex].currentNumOfCardsInDeck);
                     //console.log("Current key of deck: " + currentDeckIndex);
+
+                    //Null means it is unlimited so automatically snapped
                     if (maxCardsInDeck == null) {
                         snapped = true;
+                    //Will check if meets card limit if not unlimited
                     } else {
+
+                        //If can move to new deck
                         if (currentCardsInDeck < maxCardsInDeck) {
-                            console.log("add number");
                             currentCardsInDeck += 1;
-                            deckInfo[deckKey][specificDeckIndex].currentCardsInDeck = currentCardsInDeck
-                            deckInfo[deckKey][currentDeckIndex].currentCardsInDeck -= 1
+                            //Deck moving to is increased
+                            deckInfo[deckKey][specificMovingToDeckIndex].currentNumOfCardsInDeck = currentCardsInDeck
+
+                            //Deck moving from is decreased
+                            deckInfo[deckKey][currentDeckIndex].currentNumOfCardsInDeck -= 1
+
                             snapped = true;
-                            
+
                             //change the values of the deck it is moving from and the card it is moving to
 
                             //where it is moving from
-                            onDeckCurrentNumberChange(deckKey, currentDeckIndex, deckInfo[deckKey][currentDeckIndex].currentCardsInDeck)
+                            onDeckCurrentNumberChange(deckKey, currentDeckIndex, deckInfo?.[deckKey]?.[currentDeckIndex]?.currentNumOfCardsInDeck)
+                            const currentCardIDsOrderInMovingFromDeck = deckInfo[deckKey][currentDeckIndex].cardIDsOrderInDeck;
+                            var isMovedFrom = false;
+                            const newCardIDsOrderInMovingFromDeck = currentCardIDsOrderInMovingFromDeck.filter((cardId) => 
+                            {
+                                //Avoid removing duplicates in deck (only remove one)
+                                //Remove the first card on top that matches
+                                if(cardId == card.id && !isMovedFrom){
+                                    isMovedFrom = true
+                                    return false
+                                }else{
+                                    return true
+                                }
+                            }
+                            )
 
+
+                            setDeckInfo((prevDeckInfos) =>{
+                                const currentDeckInfoInType = prevDeckInfos[deckKey] || {};
+                                return{
+                                    ...prevDeckInfos,
+                                    [deckKey]: {
+                                        ...currentDeckInfoInType,
+                                        [currentDeckIndex]: {
+                                            rect: currentDeckInfoInType[currentDeckIndex].rect,
+                                            currentNumOfCardsInDeck: currentDeckInfoInType[currentDeckIndex].currentNumOfCardsInDeck,
+                                            maxCardsInDeck: currentDeckInfoInType[currentDeckIndex].maxCardsInDeck,
+                                            cardIDsOrderInDeck: newCardIDsOrderInMovingFromDeck,
+                                        },
+                                },
+
+                            }
+                            })
+
+                            
                             //where it is moving to
-                            onDeckCurrentNumberChange(deckKey, Number(specificDeckIndex), currentCardsInDeck);
+                            onDeckCurrentNumberChange(deckKey, Number(specificMovingToDeckIndex), currentCardsInDeck);
+                            const currentCardIDsOrderInMovingToDeck = deckInfo?.[deckKey]?.[Number(specificMovingToDeckIndex)]?.cardIDsOrderInDeck ?? [];
+                            const newCardIDsOrderInMovingToDeck = [card.id, ...currentCardIDsOrderInMovingToDeck];
+                            setDeckInfo((prevDeckInfos) =>{
+                                const currentDeckInfoInType = prevDeckInfos[deckKey] || {};
+                                return{
+                                    ...prevDeckInfos,
+                                    [deckKey]: {
+                                        ...currentDeckInfoInType,
+                                        [Number(specificMovingToDeckIndex)]: {
+                                            rect: currentDeckInfoInType[Number(specificMovingToDeckIndex)].rect,
+                                            currentNumOfCardsInDeck: currentDeckInfoInType[Number(specificMovingToDeckIndex)].currentNumOfCardsInDeck,
+                                            maxCardsInDeck: currentDeckInfoInType[Number(specificMovingToDeckIndex)].maxCardsInDeck,
+                                            cardIDsOrderInDeck: newCardIDsOrderInMovingToDeck,
+                                        },
+                                },
+
+                            }
+                            })
+
 
                             //change specific deck index to new one you moved to
-                            setCurrentIndex(Number(specificDeckIndex));
+                            setCurrentIndex(Number(specificMovingToDeckIndex));
                         } else {
                             console.log("Don't add number");
                             snapped = false;
@@ -175,7 +223,7 @@ const DraggableCard: React.FC<DraggableCardProps> = ({ card, deckIndex }) => {
                     ...currentDeckInfo,
                     [deckIndex]: {
                         ...currentDeckInfo[deckIndex],
-                        currentCardsInDeck,
+                        currentNumOfCardsInDeck: currentCardsInDeck,
                     },
                 },
             };
