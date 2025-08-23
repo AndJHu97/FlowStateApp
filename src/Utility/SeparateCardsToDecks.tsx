@@ -22,6 +22,7 @@ const SeparateCardsByDecks = async (cardType: string, subCardType: string): Prom
     const allCards: AllCards = {};
 
     try {
+        //use onAuthstateChanged instead of auth.currentuser because onAuthStateChanged ensures
         const user: User = await new Promise((resolve, reject) => {
             const unsubscribe = onAuthStateChanged(auth, (user) => {
                 unsubscribe();

@@ -6,12 +6,13 @@ interface DeckInfoInType {
         rect: DOMRect;
         maxCardsInDeck: number | null;
         currentNumOfCardsInDeck: number;
-        cardIDsOrderInDeck: number[];
+        cardIDsOrderInDeck: string[];
     }
 }
 
 interface DeckContextType {
     //This is all the decks organized by the key deck type
+    //key is based on deck location
     deckInfo: { [key: string]: DeckInfoInType };
     setDeckInfo: React.Dispatch<React.SetStateAction<{ [key: string]: DeckInfoInType }>>;
 }
