@@ -21,16 +21,16 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
     {
         const deckRef = useRef<HTMLDivElement>(null);
         const localMaxCardsToLoad = maxCardsToLoad === null ? cardData[deckLocation].length : maxCardsToLoad;
-        const numOfCardsLoaded = cardData[deckLocation].length;
+        const numOfCardsLoaded = cardData[deckLocation].length> 0 ? localMaxCardsToLoad : cardData[deckLocation].length;
         const [numOfCardsInDeck] = useState<number>(numOfCardsLoaded);
         const [unlockedCardIds, setUnlockedCardIds] = useState<Set<string>>(new Set());
 
-        console.log("Deck location: " + deckLocation + " cards in deck " + numOfCardsLoaded);
+        console.log("Deck location: " + deckLocation + " cards in deck " + numOfCardsLoaded + " max cards in deck: " + maxCardsInDeck);
         const deckContext = useContext(DeckContext);
         if(!deckContext){
             throw new Error("DeckContext is not available");
         }
-        const { deckInfo, setDeckInfo} = deckContext;
+        const { decks: deckInfo, setDeckInfo} = deckContext;
 
         //get loading area from the cardLoading Area and pass to main
         const handleCardLoadingArea = (rect: DOMRect) =>{
@@ -46,7 +46,7 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
                         ...currentDeckInfoInType,
                         [deckIndex]: {
                             rect: rect,
-                            currentNumOfCardsInDeck: numOfCardsInDeck,
+                            currentNumOfCards: numOfCardsInDeck,
                             maxCardsInDeck: maxCardsInDeck,
                             //Get the already set selected card id
                             cardIDsOrderInDeck: currentDeckInfoInType[deckIndex]?.cardIDsOrderInDeck
@@ -82,7 +82,7 @@ const Deck: React.FC<DeckProps> = (({cardData, deckID: deckLocation, deckIndex, 
                         ...currentDeckInfoInType,
                         [deckIndex]: {
                             rect: currentDeckInfoInType[deckIndex].rect,
-                            currentNumOfCardsInDeck: numOfCardsInDeck,
+                            currentNumOfCards: numOfCardsInDeck,
                             maxCardsInDeck: maxCardsInDeck,
                             cardIDsOrderInDeck: cardIDsOrderInDeck,
                         },
